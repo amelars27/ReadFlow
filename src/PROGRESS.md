@@ -7,8 +7,8 @@
 ## LAST SESSION STATUS
 
 - **Tanggal**: 25 Juli 2026
-- **Phase**: Phase 3 — CRUD Reading Materials ✅
-- **Status**: Semua CRUD Reading Materials, Categories, dan Authors sudah selesai.
+- **Phase**: Phase 4 — Reading Sessions Backend 🚧
+- **Status**: Database, Models, Controller, dan Routes Reading Sessions selesai. Blade Views belum diimplementasi.
 
 ---
 
@@ -55,6 +55,17 @@
 - [x] 3 views: index, create, edit
 - [x] Pagination 10
 
+### Reading Sessions Backend (Phase 4) 🚧
+- [x] Database — migration add start_time, end_time, notes (2025_07_26_000003)
+- [x] Model — fillable, casts (session_date, start_time, end_time), belongsTo(User), belongsTo(ReadingMaterial)
+- [x] Relationships — User hasMany(ReadingSession), ReadingMaterial hasMany(ReadingSession)
+- [x] Controller — ReadingSessionController (index, create, store, edit, update, destroy + authorizeAccess)
+- [x] Form Requests — StoreReadingSessionRequest, UpdateReadingSessionRequest
+- [x] Routes — 7 resource routes (reading-sessions.*) via Route::resource
+- [x] Sidebar — menu Reading Sessions aktif mengarah ke reading-sessions.index
+- [ ] Blade Views — **belum diimplementasi** (index, create, edit, _form)
+- [ ] Functional Testing — belum dimulai
+
 ---
 
 ## CURRENT STATE
@@ -65,7 +76,7 @@ Dashboard       → dashboard ✅
 Reading Materials → reading-materials.* ✅
 Categories      → categories.* ✅
 Authors         → authors.* ✅
-Reading Sessions  → placeholder #
+Reading Sessions  → reading-sessions.* ✅
 Reading Notes     → placeholder #
 Reading Goals     → placeholder #
 Bookmarks         → placeholder #
@@ -78,6 +89,7 @@ Profile           → placeholder (footer)
 | `/` | Guest | ✅ Redirect to login |
 | `/dashboard` | auth+verified | ✅ Closure |
 | `/reading-materials/*` | auth+verified | ✅ Resource (7 routes) |
+| `/reading-sessions/*` | auth+verified | ✅ Resource (7 routes) |
 | `/categories/*` | auth+verified | ✅ Resource (6 routes — no show) |
 | `/authors/*` | auth+verified | ✅ Resource (6 routes — no show) |
 | `/profile/*` | auth | ✅ Breeze bawaan |
@@ -95,8 +107,14 @@ Profile           → placeholder (footer)
 
 ## NEXT TASKS (Belum dikerjakan)
 
+### Segera — Phase 4 Reading Sessions:
+- [x] Database, Model, Relationships — **selesai**
+- [x] Controller, Form Requests — **selesai**
+- [x] Routes — **selesai**
+- [ ] **Blade Views** — index, create, edit, _form
+- [ ] Functional Testing
+
 ### Phase 4 nanti:
-- [ ] Reading Sessions CRUD
 - [ ] Reading Notes CRUD
 - [ ] Reading Goals CRUD
 - [ ] Bookmarks CRUD

@@ -4,7 +4,7 @@
         ['label' => 'Reading Materials', 'icon' => 'bi-book', 'route' => 'reading-materials.index', 'active' => 'reading-materials.*'],
         ['label' => 'Categories', 'icon' => 'bi-tags', 'route' => 'categories.index', 'active' => 'categories.*'],
         ['label' => 'Authors', 'icon' => 'bi-pencil', 'route' => 'authors.index', 'active' => 'authors.*'],
-        ['label' => 'Reading Sessions', 'icon' => 'bi-clock-history', 'route' => '#'],
+        ['label' => 'Reading Sessions', 'icon' => 'bi-clock-history', 'route' => 'reading-sessions.index', 'active' => 'reading-sessions.*'],
         ['label' => 'Reading Notes', 'icon' => 'bi-journal-text', 'route' => '#'],
         ['label' => 'Reading Goals', 'icon' => 'bi-bullseye', 'route' => '#'],
         ['label' => 'Bookmarks', 'icon' => 'bi-bookmark', 'route' => '#'],

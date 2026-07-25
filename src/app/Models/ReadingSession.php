@@ -11,14 +11,19 @@ class ReadingSession extends Model
         'user_id',
         'reading_material_id',
         'session_date',
+        'start_time',
+        'end_time',
         'duration_minutes',
         'pages_read',
+        'notes',
     ];
 
     protected function casts(): array
     {
         return [
             'session_date' => 'date',
+            'start_time' => 'datetime:H:i',
+            'end_time' => 'datetime:H:i',
         ];
     }
 

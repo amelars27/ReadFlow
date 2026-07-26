@@ -12,7 +12,17 @@ class ReadingNote extends Model
         'reading_material_id',
         'title',
         'summary',
+        'insight',
+        'favorite_quote',
+        'rating',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'rating' => 'integer',
+        ];
+    }
 
     public function user(): BelongsTo
     {

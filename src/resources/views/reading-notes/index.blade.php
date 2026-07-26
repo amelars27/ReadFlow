@@ -1,8 +1,8 @@
 @extends('layouts.readflow')
 
-@section('title', 'Reading Sessions')
+@section('title', 'Reading Notes')
 
-@section('header', 'Reading Sessions')
+@section('header', 'Reading Notes')
 
 @section('content')
     @if (session('success'))
@@ -15,42 +15,48 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center">
-            <h6 class="mb-0 fw-semibold">All Reading Sessions</h6>
-            <a href="{{ route('reading-sessions.create') }}" class="btn btn-primary btn-sm">
+            <h6 class="mb-0 fw-semibold">All Reading Notes</h6>
+            <a href="{{ route('reading-notes.create') }}" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-lg me-1"></i>Add New
             </a>
         </div>
         <div class="card-body p-0">
-            @if ($readingSessions->count())
+            @if ($readingNotes->count())
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th>Reading Material</th>
-                                <th>Session Date</th>
-                                <th>Duration</th>
-                                <th>Pages Read</th>
+                                <th>Note Title</th>
+                                <th>Rating</th>
                                 <th>Created At</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($readingSessions as $session)
+                            @foreach ($readingNotes as $note)
                                 <tr>
-                                    <td class="fw-semibold">{{ $session->readingMaterial->title }}</td>
-                                    <td class="text-muted">{{ $session->session_date->format('M d, Y') }}</td>
-                                    <td>{{ $session->duration_minutes }} min</td>
-                                    <td>{{ $session->pages_read ?? '—' }}</td>
-                                    <td class="text-muted">{{ $session->created_at->format('M d, Y') }}</td>
+                                    <td class="fw-semibold">{{ $note->readingMaterial->title }}</td>
+                                    <td>{{ $note->title }}</td>
+                                    <td>
+                                        @if ($note->rating)
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                <i class="bi {{ $i <= $note->rating ? 'bi-star-fill text-warning' : 'bi-star text-muted' }}"></i>
+                                            @endfor
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-muted">{{ $note->created_at->format('M d, Y') }}</td>
                                     <td class="text-end">
-                                        <a href="{{ route('reading-sessions.edit', $session) }}" class="btn btn-outline-primary btn-sm me-1">
+                                        <a href="{{ route('reading-notes.edit', $note) }}" class="btn btn-outline-primary btn-sm me-1">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <form action="{{ route('reading-sessions.destroy', $session) }}" method="POST" class="d-inline">
+                                        <form action="{{ route('reading-notes.destroy', $note) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-outline-danger btn-sm"
-                                                    onclick="return confirm('Are you sure you want to delete this reading session?')">
+                                                    onclick="return confirm('Are you sure you want to delete this reading note?')">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -62,17 +68,17 @@
                 </div>
             @else
                 <div class="text-center py-5 text-muted">
-                    <i class="bi bi-clock-history fs-1 d-block mb-3"></i>
-                    <p class="mb-0">No reading sessions yet.</p>
-                    <a href="{{ route('reading-sessions.create') }}" class="btn btn-primary mt-3">
-                        <i class="bi bi-plus-lg me-1"></i>Log Your First Reading Session
+                    <i class="bi bi-journal-text fs-1 d-block mb-3"></i>
+                    <p class="mb-0">No reading notes yet.</p>
+                    <a href="{{ route('reading-notes.create') }}" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-lg me-1"></i>Create Your First Reading Note
                     </a>
                 </div>
             @endif
         </div>
-        @if ($readingSessions->hasPages())
+        @if ($readingNotes->hasPages())
             <div class="card-footer bg-transparent border-top">
-                {{ $readingSessions->links() }}
+                {{ $readingNotes->links() }}
             </div>
         @endif
     </div>

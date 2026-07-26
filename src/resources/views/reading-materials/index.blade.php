@@ -32,6 +32,7 @@
                                 <th>Source</th>
                                 <th>Pages</th>
                                 <th>Status</th>
+                                <th class="text-center">Bookmark</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -56,6 +57,25 @@
                                             };
                                         @endphp
                                         <span class="badge bg-{{ $statusBadge }}">{{ $material->status->value }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (isset($bookmarks[$material->id]))
+                                            <form action="{{ route('bookmarks.destroy', $bookmarks[$material->id]) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-warning" title="Remove Bookmark">
+                                                    <i class="bi bi-bookmark-fill"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('bookmarks.store') }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="reading_material_id" value="{{ $material->id }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Add Bookmark">
+                                                    <i class="bi bi-bookmark"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
                                     <td class="text-end">
                                         <a href="{{ route('reading-materials.edit', $material) }}" class="btn btn-outline-primary btn-sm me-1">

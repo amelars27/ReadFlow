@@ -1,16 +1,14 @@
 <?php
 
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReadingMaterialController;
 use App\Http\Controllers\ReadingGoalController;
 use App\Http\Controllers\ReadingNoteController;
 use App\Http\Controllers\ReadingSessionController;
-use App\Models\ReadingGoal;
-use App\Models\ReadingMaterial;
-use App\Models\ReadingNote;
-use App\Models\ReadingSession;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,42 +16,7 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        $userId = auth()->id();
-
-        $totalMaterials = ReadingMaterial::where('user_id', $userId)->count();
-        $totalSessions = ReadingSession::where('user_id', $userId)->count();
-        $totalNotes = ReadingNote::where('user_id', $userId)->count();
-        $activeGoals = ReadingGoal::where('user_id', $userId)->where('status', 'active')->count();
-
-        $recentSessions = ReadingSession::where('user_id', $userId)
-            ->with('readingMaterial')
-            ->latest()
-            ->take(5)
-            ->get();
-
-        $recentNotes = ReadingNote::where('user_id', $userId)
-            ->with('readingMaterial')
-            ->latest()
-            ->take(5)
-            ->get();
-
-        $activeReadingGoals = ReadingGoal::where('user_id', $userId)
-            ->where('status', 'active')
-            ->with('readingMaterial')
-            ->latest()
-            ->get();
-
-        return view('dashboard', compact(
-            'totalMaterials',
-            'totalSessions',
-            'totalNotes',
-            'activeGoals',
-            'recentSessions',
-            'recentNotes',
-            'activeReadingGoals',
-        ));
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('reading-materials', ReadingMaterialController::class);
     Route::resource('categories', CategoryController::class);
@@ -61,6 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('reading-sessions', ReadingSessionController::class);
     Route::resource('reading-notes', ReadingNoteController::class);
     Route::resource('reading-goals', ReadingGoalController::class);
+    Route::resource('bookmarks', BookmarkController::class)->only(['index', 'store', 'destroy']);
 });
 
 Route::middleware('auth')->group(function () {

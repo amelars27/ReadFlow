@@ -7,6 +7,7 @@ use App\Enums\SourceType;
 use App\Http\Requests\StoreReadingMaterialRequest;
 use App\Http\Requests\UpdateReadingMaterialRequest;
 use App\Models\Author;
+use App\Models\Bookmark;
 use App\Models\Category;
 use App\Models\ReadingMaterial;
 
@@ -19,7 +20,10 @@ class ReadingMaterialController extends Controller
             ->latest()
             ->paginate(12);
 
-        return view('reading-materials.index', compact('readingMaterials'));
+        $bookmarks = Bookmark::where('user_id', auth()->id())
+            ->pluck('id', 'reading_material_id');
+
+        return view('reading-materials.index', compact('readingMaterials', 'bookmarks'));
     }
 
     public function create()

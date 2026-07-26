@@ -6,9 +6,9 @@
 
 ## LAST SESSION STATUS
 
-- **Tanggal**: 25 Juli 2026
-- **Phase**: Phase 4 — Reading Sessions Backend 🚧
-- **Status**: Database, Models, Controller, dan Routes Reading Sessions selesai. Blade Views belum diimplementasi.
+- **Tanggal**: 26 Juli 2026
+- **Phase**: Phase 5 — Reading Notes CRUD ✅
+- **Status**: Database, Models, Controller, Form Requests, Routes, Blade Views, dan Sidebar Reading Notes selesai.
 
 ---
 
@@ -55,7 +55,7 @@
 - [x] 3 views: index, create, edit
 - [x] Pagination 10
 
-### Reading Sessions Backend (Phase 4) 🚧
+### Reading Sessions Backend (Phase 4) ✅
 - [x] Database — migration add start_time, end_time, notes (2025_07_26_000003)
 - [x] Model — fillable, casts (session_date, start_time, end_time), belongsTo(User), belongsTo(ReadingMaterial)
 - [x] Relationships — User hasMany(ReadingSession), ReadingMaterial hasMany(ReadingSession)
@@ -63,8 +63,18 @@
 - [x] Form Requests — StoreReadingSessionRequest, UpdateReadingSessionRequest
 - [x] Routes — 7 resource routes (reading-sessions.*) via Route::resource
 - [x] Sidebar — menu Reading Sessions aktif mengarah ke reading-sessions.index
-- [ ] Blade Views — **belum diimplementasi** (index, create, edit, _form)
+- [x] Blade Views — index, create, edit, _form
 - [ ] Functional Testing — belum dimulai
+
+### Reading Notes CRUD (Phase 5) ✅
+- [x] Database — migration add insight, favorite_quote, rating (2025_07_26_000004)
+- [x] Model — fillable (insight, favorite_quote, rating), casts (rating → integer)
+- [x] Relationships — User hasMany(ReadingNote), ReadingMaterial hasMany(ReadingNote)
+- [x] Controller — ReadingNoteController (index, create, store, edit, update, destroy + authorizeAccess)
+- [x] Form Requests — StoreReadingNoteRequest, UpdateReadingNoteRequest
+- [x] Routes — 7 resource routes (reading-notes.*) via Route::resource
+- [x] Sidebar — menu Reading Notes aktif mengarah ke reading-notes.index
+- [x] Blade Views — index, create, edit, _form
 
 ---
 
@@ -77,7 +87,7 @@ Reading Materials → reading-materials.* ✅
 Categories      → categories.* ✅
 Authors         → authors.* ✅
 Reading Sessions  → reading-sessions.* ✅
-Reading Notes     → placeholder #
+Reading Notes     → reading-notes.* ✅
 Reading Goals     → placeholder #
 Bookmarks         → placeholder #
 Profile           → placeholder (footer)
@@ -90,6 +100,7 @@ Profile           → placeholder (footer)
 | `/dashboard` | auth+verified | ✅ Closure |
 | `/reading-materials/*` | auth+verified | ✅ Resource (7 routes) |
 | `/reading-sessions/*` | auth+verified | ✅ Resource (7 routes) |
+| `/reading-notes/*` | auth+verified | ✅ Resource (7 routes) |
 | `/categories/*` | auth+verified | ✅ Resource (6 routes — no show) |
 | `/authors/*` | auth+verified | ✅ Resource (6 routes — no show) |
 | `/profile/*` | auth | ✅ Breeze bawaan |
@@ -107,15 +118,7 @@ Profile           → placeholder (footer)
 
 ## NEXT TASKS (Belum dikerjakan)
 
-### Segera — Phase 4 Reading Sessions:
-- [x] Database, Model, Relationships — **selesai**
-- [x] Controller, Form Requests — **selesai**
-- [x] Routes — **selesai**
-- [ ] **Blade Views** — index, create, edit, _form
-- [ ] Functional Testing
-
-### Phase 4 nanti:
-- [ ] Reading Notes CRUD
+### Segera — Phase 6:
 - [ ] Reading Goals CRUD
 - [ ] Bookmarks CRUD
 - [ ] Dashboard real data (statistik dari database)

@@ -13,7 +13,7 @@
 | 3 | `categories` | id, name, description | — |
 | 4 | `reading_materials` | id, user_id, category_id, author_id, title, source_type, status, total_pages, ... | user_id → users, category_id → categories, author_id → authors |
 | 5 | `reading_sessions` | id, user_id, reading_material_id, session_date, start_time, end_time, duration_minutes, pages_read, notes | user_id → users, reading_material_id → reading_materials |
-| 6 | `reading_notes` | id, user_id, reading_material_id, title, summary | user_id → users, reading_material_id → reading_materials |
+| 6 | `reading_notes` | id, user_id, reading_material_id, title, summary, insight, favorite_quote, rating | user_id → users, reading_material_id → reading_materials |
 | 7 | `reading_goals` | id, user_id, daily_target_minutes, weekly_target_minutes, yearly_target_books | user_id → users |
 | 8 | `bookmarks` | id, user_id, reading_material_id, created_at | user_id → users, reading_material_id → reading_materials |
 
@@ -28,7 +28,7 @@
 
 ---
 
-## Migrations (13 files)
+## Migrations (14 files)
 
 | File | Isi |
 |------|-----|
@@ -40,7 +40,8 @@
 | `2025_07_24_000003_create_reading_materials_table` | reading_materials (dengan author_id FK) |
 | `2025_07_24_000004_create_reading_sessions_table` | reading_sessions (base) |
 | `2025_07_26_000003_add_start_time_end_time_notes_to_reading_sessions` | reading_sessions — add start_time, end_time, notes |
-| `2025_07_24_000005_create_reading_notes_table` | reading_notes |
+| `2025_07_24_000005_create_reading_notes_table` | reading_notes (base) |
+| `2025_07_26_000004_add_insight_favorite_quote_rating_to_reading_notes` | reading_notes — add insight, favorite_quote, rating |
 | `2025_07_24_000006_create_reading_goals_table` | reading_goals |
 | `2025_07_24_000007_create_bookmarks_table` | bookmarks |
 | `2025_07_26_000001_drop_author_id_add_author_to_reading_materials` | author_id → author (string) — **rolled forward by migration 2** |
@@ -57,18 +58,19 @@
 | `Category` | name, description | HasMany readingMaterials |
 | `Author` | name, biography | HasMany readingMaterials |
 | `ReadingSession` | user_id, reading_material_id, session_date, start_time, end_time, duration_minutes, pages_read, notes | BelongsTo user, readingMaterial |
-| `ReadingNote` | user_id, reading_material_id, title, summary | BelongsTo user, readingMaterial |
+| `ReadingNote` | user_id, reading_material_id, title, summary, insight, favorite_quote, rating | BelongsTo user, readingMaterial · casts: rating (integer) |
 | `ReadingGoal` | user_id, daily_target_minutes, weekly_target_minutes, yearly_target_books | BelongsTo user |
 | `Bookmark` | user_id, reading_material_id | BelongsTo user, readingMaterial (`$timestamps = false`) |
 
 ---
 
-## Controllers (6)
+## Controllers (7)
 
 | Controller | Actions |
 |------------|---------|
 | `ReadingMaterialController` | index, create, store, show, edit, update, destroy (+ authorizeAccess private) |
 | `ReadingSessionController` | index, create, store, edit, update, destroy (+ authorizeAccess private) |
+| `ReadingNoteController` | index, create, store, edit, update, destroy (+ authorizeAccess private) |
 | `CategoryController` | index, create, store, edit, update, destroy |
 | `AuthorController` | index, create, store, edit, update, destroy |
 | `ProfileController` | edit, update, destroy (Breeze bawaan) |
@@ -76,7 +78,7 @@
 
 ---
 
-## Form Requests (9)
+## Form Requests (11)
 
 | Request | Validasi Utama |
 |---------|----------------|
@@ -84,6 +86,8 @@
 | `UpdateReadingMaterialRequest` | Sama |
 | `StoreReadingSessionRequest` | reading_material_id (exists), session_date, start_time, end_time (after:start_time), duration_minutes, pages_read, notes |
 | `UpdateReadingSessionRequest` | Sama |
+| `StoreReadingNoteRequest` | reading_material_id (exists), title (max:255), summary, insight, favorite_quote (nullable), rating (nullable, integer, 1–5) |
+| `UpdateReadingNoteRequest` | Sama |
 | `StoreCategoryRequest` | name (required, unique, max:100), description |
 | `UpdateCategoryRequest` | name (required, unique ignore self, max:100), description |
 | `StoreAuthorRequest` | name (required, max:255), biography |
@@ -92,7 +96,7 @@
 
 ---
 
-## Blade Views (37 files)
+## Blade Views (41 files)
 
 ### Layouts
 | File | Keterangan |
@@ -113,7 +117,8 @@
 | Module | Views |
 |--------|-------|
 | **Reading Materials** | `index.blade.php`, `create.blade.php`, `edit.blade.php`, `show.blade.php` |
-| **Reading Sessions** | Tidak ada — masih placeholder di sidebar |
+| **Reading Sessions** | `index.blade.php`, `create.blade.php`, `edit.blade.php`, `_form.blade.php` |
+| **Reading Notes** | `index.blade.php`, `create.blade.php`, `edit.blade.php`, `_form.blade.php` |
 | **Categories** | `index.blade.php`, `create.blade.php`, `edit.blade.php` |
 | **Authors** | `index.blade.php`, `create.blade.php`, `edit.blade.php` |
 
@@ -139,7 +144,7 @@
 
 ---
 
-## Routes (28 endpoint terdaftar)
+## Routes (35 endpoint terdaftar)
 
 ### Authenticated + Verified
 | Method | URI | Nama Route |
@@ -147,6 +152,7 @@
 | GET | `/dashboard` | `dashboard` |
 | GET/POST/PUT/DELETE | `/reading-materials` + `{readingMaterial}` | `reading-materials.*` (7 route) |
 | GET/POST/PUT/DELETE | `/reading-sessions` + `{readingSession}` | `reading-sessions.*` (7 route) |
+| GET/POST/PUT/DELETE | `/reading-notes` + `{readingNote}` | `reading-notes.*` (7 route) |
 | GET/POST/PUT/DELETE | `/categories` + `{category}` | `categories.*` (6 route) |
 | GET/POST/PUT/DELETE | `/authors` + `{author}` | `authors.*` (6 route) |
 
@@ -174,7 +180,7 @@ Reading Materials → reading-materials.*
 Categories      → categories.*
 Authors         → authors.*
 Reading Sessions  → reading-sessions.*
-Reading Notes     → (placeholder)
+Reading Notes     → reading-notes.*
 Reading Goals     → (placeholder)
 Bookmarks         → (placeholder)
 Profile           → (placeholder footer)
@@ -191,12 +197,21 @@ Profile           → (placeholder footer)
   - Author dropdown + button "+ New" (target _blank)
   - Source Type & Status dropdown (dari enum)
   - Form Request validation, flash messages, pagination
-- [x] **Reading Sessions Backend** — database, model, controller, routes
+- [x] **Reading Sessions Backend** — database, model, controller, routes, views
   - Database: start_time, end_time, notes columns added
   - Model: fillable, casts, belongsTo relationships
   - Controller: index, create, store, edit, update, destroy
   - Routes: 7 resource routes terdaftar
-  - Blade views: belum diimplementasi
+  - Blade views: index, create, edit, _form
+- [x] **Reading Notes CRUD** — create, read, update, delete
+  - Database: insight, favorite_quote, rating columns added via migration
+  - Model: fillable + rating integer cast
+  - Controller: index, create, store, edit, update, destroy + authorizeAccess
+  - Form Requests: StoreReadingNoteRequest, UpdateReadingNoteRequest
+  - Routes: 7 resource routes (reading-notes.*) via Route::resource
+  - Blade views: 4 files (index, create, edit, _form)
+  - Star rating display in index
+  - Pagination 10
 - [x] **Categories CRUD** — create, read, update, delete
   - Pagination 10, delete confirmation, flash messages
 - [x] **Authors CRUD** — create, read, update, delete
@@ -210,4 +225,4 @@ Profile           → (placeholder footer)
 
 1. **Legacy code**: `DashboardController` masih berisi kode Movie/Genre dari aplikasi sebelumnya. Tidak dipakai karena route dashboard sudah pakai closure.
 2. **ProfileController error**: Referensi di routes tapi file mungkin tidak ada — ini isu pre-existing dari Breeze scaffold.
-3. **Belum diimplementasi**: Reading Notes, Reading Goals, Bookmarks — masih placeholder di sidebar.
+3. **Belum diimplementasi**: Reading Goals, Bookmarks — masih placeholder di sidebar.

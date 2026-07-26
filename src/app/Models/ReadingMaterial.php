@@ -61,4 +61,9 @@ class ReadingMaterial extends Model
     {
         return $this->hasMany(Bookmark::class);
     }
+
+    public function readingGoals(): HasMany
+    {
+        return $this->hasMany(ReadingGoal::class);
+    }
 }

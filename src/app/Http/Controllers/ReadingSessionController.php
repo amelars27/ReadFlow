@@ -13,18 +13,21 @@ class ReadingSessionController extends Controller
     public function index()
     {
         $activeSession = ReadingSession::where('user_id', auth()->id())
-            ->with('readingMaterial.author', 'readingMaterial.category')
+            ->with(['readingMaterial.author', 'readingMaterial.category'])
             ->active()
             ->latest()
             ->first();
 
         $recentSessions = ReadingSession::where('user_id', auth()->id())
-            ->with('readingMaterial.author', 'readingMaterial.category')
+            ->with(['readingMaterial.author', 'readingMaterial.category'])
             ->completed()
             ->latest()
             ->paginate(10);
 
-        return view('reading-sessions.index', compact('activeSession', 'recentSessions'));
+        return view('reading-sessions.index', compact(
+            'activeSession',
+            'recentSessions'
+        ));
     }
 
     public function start(ReadingMaterial $readingMaterial)
@@ -36,7 +39,8 @@ class ReadingSessionController extends Controller
             ->first();
 
         if ($existing) {
-            return redirect()->route('reading-sessions.index')
+            return redirect()
+                ->route('reading-sessions.index')
                 ->with('error', 'You already have an active reading session.');
         }
 
@@ -48,7 +52,8 @@ class ReadingSessionController extends Controller
             'status' => 'Active',
         ]);
 
-        return redirect()->route('reading-sessions.index')
+        return redirect()
+            ->route('reading-sessions.index')
             ->with('success', 'Reading session started successfully.');
     }
 
@@ -68,7 +73,8 @@ class ReadingSessionController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        return redirect()->route('reading-sessions.index')
+        return redirect()
+            ->route('reading-sessions.index')
             ->with('success', 'Reading session created successfully.');
     }
 
@@ -80,7 +86,10 @@ class ReadingSessionController extends Controller
             ->orderBy('title')
             ->get();
 
-        return view('reading-sessions.edit', compact('readingSession', 'readingMaterials'));
+        return view('reading-sessions.edit', compact(
+            'readingSession',
+            'readingMaterials'
+        ));
     }
 
     public function update(UpdateReadingSessionRequest $request, ReadingSession $readingSession)
@@ -89,7 +98,8 @@ class ReadingSessionController extends Controller
 
         $readingSession->update($request->validated());
 
-        return redirect()->route('reading-sessions.index')
+        return redirect()
+            ->route('reading-sessions.index')
             ->with('success', 'Reading session updated successfully.');
     }
 
@@ -99,7 +109,8 @@ class ReadingSessionController extends Controller
 
         $readingSession->delete();
 
-        return redirect()->route('reading-sessions.index')
+        return redirect()
+            ->route('reading-sessions.index')
             ->with('success', 'Reading session deleted successfully.');
     }
 

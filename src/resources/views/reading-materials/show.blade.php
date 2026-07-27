@@ -65,6 +65,29 @@
                         <span class="badge bg-{{ $statusBadge }}">{{ $readingMaterial->status->value }}</span>
                     </div>
 
+                    @php
+                        $totalPages = $readingMaterial->total_pages;
+                        $currentPage = $readingMaterial->current_page ?? 0;
+                        $progress = ($totalPages && $totalPages > 0) ? min(100, round(($currentPage / $totalPages) * 100)) : null;
+                    @endphp
+
+                    @if ($progress !== null)
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                <span>Page {{ $currentPage }} of {{ $totalPages }}</span>
+                                <span>{{ $progress }}%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar"
+                                     style="width: {{ $progress }}%;"
+                                     aria-valuenow="{{ $progress }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     @if ($readingMaterial->description)
                         <p class="text-muted mb-4">{{ $readingMaterial->description }}</p>
                     @endif
@@ -76,6 +99,9 @@
                                 <i class="bi bi-play-fill me-1"></i>Start Reading
                             </button>
                         </form>
+                        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#progressModal">
+                            <i class="bi bi-bar-chart me-1"></i>Update Progress
+                        </button>
                     </div>
 
                     <div class="d-flex gap-2 flex-wrap">
@@ -107,6 +133,41 @@
                         <i class="bi bi-arrow-left me-1"></i>Back to Library
                     </a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Progress Modal --}}
+    <div class="modal fade" id="progressModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <form action="{{ route('reading-materials.progress', $readingMaterial) }}" method="POST">
+                    @csrf
+                    <div class="modal-header border-bottom">
+                        <h6 class="modal-title fw-semibold">
+                            <i class="bi bi-bar-chart me-1"></i>Update Reading Progress
+                        </h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="current-page-input" class="form-label fw-semibold">Current Page</label>
+                            <input type="number" class="form-control" id="current-page-input"
+                                   name="current_page"
+                                   min="0" max="{{ $readingMaterial->total_pages ?? 0 }}"
+                                   value="{{ $readingMaterial->current_page ?? 0 }}">
+                            @if ($readingMaterial->total_pages)
+                                <div class="form-text">Total Pages: {{ $readingMaterial->total_pages }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Save
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -38,22 +38,24 @@
                         </thead>
                         <tbody>
                             @foreach ($readingGoals as $goal)
-                                @php
-                                    $progress = $goal->target_value > 0
-                                        ? min(100, round(($goal->current_value / $goal->target_value) * 100))
-                                        : 0;
-                                    $progressBarClass = match (true) {
-                                        $progress >= 100 => 'bg-success',
-                                        $progress >= 50 => 'bg-primary',
-                                        $progress >= 25 => 'bg-info',
-                                        default => 'bg-secondary',
-                                    };
-                                @endphp
                                 <tr>
                                     <td class="fw-semibold">{{ $goal->readingMaterial->title }}</td>
                                     <td><span class="badge bg-secondary">{{ ucfirst($goal->goal_type) }}</span></td>
-                                    <td>{{ $goal->target_value }}</td>
-                                    <td>{{ $goal->current_value }}</td>
+                                    @php
+                                        $totalPages = $goal->readingMaterial->total_pages ?? 0;
+                                        $currentPage = $goal->readingMaterial->current_page ?? 0;
+                                        $progress = $totalPages > 0
+                                            ? min(100, round(($currentPage / $totalPages) * 100))
+                                            : 0;
+                                        $progressBarClass = match (true) {
+                                            $progress >= 100 => 'bg-success',
+                                            $progress >= 50 => 'bg-primary',
+                                            $progress >= 25 => 'bg-info',
+                                            default => 'bg-secondary',
+                                        };
+                                    @endphp
+                                    <td>{{ $totalPages ?: '—' }}</td>
+                                    <td>{{ $currentPage }}</td>
                                     <td style="min-width: 140px;">
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="progress flex-grow-1" style="height: 8px;">

@@ -13,13 +13,13 @@ class ReadingSessionController extends Controller
     public function index()
     {
         $currentSession = ReadingSession::where('user_id', auth()->id())
-            ->with(['readingMaterial.author', 'readingMaterial.category'])
+            ->with('readingMaterial')
             ->inProgress()
             ->latest()
             ->first();
 
         $recentSessions = ReadingSession::where('user_id', auth()->id())
-            ->with(['readingMaterial.author', 'readingMaterial.category'])
+            ->with('readingMaterial')
             ->completed()
             ->latest()
             ->paginate(10);
@@ -35,23 +35,10 @@ class ReadingSessionController extends Controller
         $this->authorizeAccessMaterial($readingMaterial);
 
         $existing = ReadingSession::where('user_id', auth()->id())
-            ->where('reading_material_id', $readingMaterial->id)
             ->inProgress()
             ->first();
 
         if ($existing) {
-            if ($existing->status === 'Paused') {
-                $this->resumeSession($existing);
-            }
-
-            return redirect()->route('reading-sessions.index');
-        }
-
-        $otherActive = ReadingSession::where('user_id', auth()->id())
-            ->inProgress()
-            ->first();
-
-        if ($otherActive) {
             return redirect()
                 ->route('reading-sessions.index')
                 ->with('error', 'You already have an active reading session.');
@@ -94,7 +81,10 @@ class ReadingSessionController extends Controller
             return redirect()->route('reading-sessions.index');
         }
 
-        $this->resumeSession($readingSession);
+        $readingSession->update([
+            'end_time' => null,
+            'status' => 'Active',
+        ]);
 
         return redirect()->route('reading-sessions.index');
     }
@@ -189,28 +179,6 @@ class ReadingSessionController extends Controller
         return redirect()
             ->route('reading-sessions.index')
             ->with('success', 'Reading session deleted successfully.');
-    }
-
-    private function resumeSession(ReadingSession $session): void
-    {
-        $now = now();
-
-        if ($session->end_time && $session->start_time) {
-            $adjustedStart = $session->start_time->copy();
-            $adjustedStart->setDateFrom($now);
-
-            $pausedEnd = $session->end_time->copy();
-            $pausedEnd->setDateFrom($now);
-
-            $pauseDuration = $pausedEnd->diffInSeconds($now);
-            $adjustedStart = $adjustedStart->addSeconds($pauseDuration);
-
-            $session->start_time = $adjustedStart->format('H:i:s');
-        }
-
-        $session->end_time = null;
-        $session->status = 'Active';
-        $session->save();
     }
 
     private function authorizeAccess(ReadingSession $readingSession): void

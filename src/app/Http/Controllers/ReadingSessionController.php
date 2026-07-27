@@ -50,6 +50,7 @@ class ReadingSessionController extends Controller
             'session_date' => now()->toDateString(),
             'start_time' => now()->format('H:i:s'),
             'status' => 'Active',
+            'total_seconds' => 0,
         ]);
 
         return redirect()
@@ -57,7 +58,7 @@ class ReadingSessionController extends Controller
             ->with('success', 'Reading session started successfully.');
     }
 
-    public function pause(ReadingSession $readingSession)
+    public function pause(Request $request, ReadingSession $readingSession)
     {
         $this->authorizeAccess($readingSession);
 
@@ -65,7 +66,13 @@ class ReadingSessionController extends Controller
             return redirect()->route('reading-sessions.index');
         }
 
+        $totalSeconds = (int) $request->input('elapsed_seconds', 0);
+        if ($totalSeconds <= 0) {
+            $totalSeconds = $readingSession->total_seconds + now()->diffInSeconds($readingSession->updated_at);
+        }
+
         $readingSession->update([
+            'total_seconds' => $totalSeconds,
             'end_time' => now()->format('H:i:s'),
             'status' => 'Paused',
         ]);
@@ -89,7 +96,7 @@ class ReadingSessionController extends Controller
         return redirect()->route('reading-sessions.index');
     }
 
-    public function finish(ReadingSession $readingSession)
+    public function finish(Request $request, ReadingSession $readingSession)
     {
         $this->authorizeAccess($readingSession);
 
@@ -99,21 +106,19 @@ class ReadingSessionController extends Controller
 
         $endTime = now();
 
-        $durationMinutes = 0;
-        if ($readingSession->start_time) {
-            $start = $readingSession->start_time->copy();
-            $start->setDateFrom($endTime);
-
-            if ($readingSession->status === 'Paused' && $readingSession->end_time) {
-                $pausedEnd = $readingSession->end_time->copy();
-                $pausedEnd->setDateFrom($endTime);
-                $durationMinutes = (int) round($start->diffInMinutes($pausedEnd));
+        if ($readingSession->status === 'Active') {
+            $totalSeconds = (int) $request->input('elapsed_seconds', 0);
+            if ($totalSeconds > 0) {
+                $readingSession->total_seconds = $totalSeconds;
             } else {
-                $durationMinutes = (int) round($start->diffInMinutes($endTime, true));
+                $readingSession->total_seconds += now()->diffInSeconds($readingSession->updated_at);
             }
         }
 
+        $durationMinutes = (int) round($readingSession->total_seconds / 60);
+
         $readingSession->update([
+            'total_seconds' => $readingSession->total_seconds,
             'end_time' => $endTime->format('H:i:s'),
             'duration_minutes' => max($durationMinutes, 0),
             'status' => 'Completed',

@@ -27,14 +27,16 @@
             @if ($currentSession)
                 @php
                     $material = $currentSession->readingMaterial;
-                    $startTime = $currentSession->start_time?->format('H:i:s') ?? '00:00:00';
-                    $endTime = $currentSession->end_time?->format('H:i:s') ?? '';
+                    $elapsed = $currentSession->total_seconds;
+                    if ($currentSession->status === 'Active') {
+                        $elapsed += now()->diffInSeconds($currentSession->updated_at);
+                    }
+                    if ($elapsed < 0) $elapsed = 0;
                 @endphp
 
                 <div id="timer-section"
                      data-status="{{ $currentSession->status }}"
-                     data-start="{{ $startTime }}"
-                     data-end="{{ $endTime }}">
+                     data-elapsed="{{ $elapsed }}">
 
                     <h4 class="fw-bold mb-1">{{ $material->title }}</h4>
                     <p class="text-muted mb-4">
@@ -51,6 +53,7 @@
                         @if ($currentSession->status === 'Active')
                             <form action="{{ route('reading-sessions.pause', $currentSession) }}" method="POST">
                                 @csrf
+                                <input type="hidden" name="elapsed_seconds" id="pause-elapsed" value="0">
                                 <button type="submit" class="btn btn-outline-warning btn-lg px-4">
                                     <i class="bi bi-pause-fill me-2"></i>Pause
                                 </button>
@@ -59,13 +62,14 @@
                             <form action="{{ route('reading-sessions.resume', $currentSession) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="btn btn-outline-primary btn-lg px-4">
-                                    <i class="bi bi-play-fill me-2"></i>Resume
+                                    <i class="bi bi-play-fill me-2"></i>Continue
                                 </button>
                             </form>
                         @endif
 
                         <form action="{{ route('reading-sessions.finish', $currentSession) }}" method="POST">
                             @csrf
+                            <input type="hidden" name="elapsed_seconds" id="finish-elapsed" value="0">
                             <button type="submit" class="btn btn-success btn-lg px-4">
                                 <i class="bi bi-check-lg me-2"></i>Finish Reading
                             </button>
@@ -73,12 +77,16 @@
                     </div>
                 </div>
             @else
-                <div class="py-4">
-                    <i class="bi bi-book text-muted" style="font-size: 4rem;"></i>
-                    <h5 class="fw-semibold mt-3 mb-1">No Active Reading Session</h5>
-                    <p class="text-muted mb-0">Start reading from Reading Materials.</p>
-                    <a href="{{ route('reading-materials.index') }}" class="btn btn-primary mt-3">
-                        <i class="bi bi-book me-1"></i>Reading Materials
+                <div class="py-5">
+                    <div class="mb-3 text-primary">
+                        <i class="bi bi-hourglass-split" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="fw-semibold mb-2">Ready to Read?</h4>
+                    <p class="text-muted mb-3 mx-auto" style="max-width: 400px;">
+                        Start a focused reading session to track your time and build a consistent reading habit.
+                    </p>
+                    <a href="{{ route('reading-materials.index') }}" class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-book me-2"></i>Choose Reading Material
                     </a>
                 </div>
             @endif
@@ -99,10 +107,9 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Reading Material</th>
-                                <th>Author</th>
-                                <th>Category</th>
-                                <th>Started At</th>
-                                <th>Finished At</th>
+                                <th>Date</th>
+                                <th>Started</th>
+                                <th>Finished</th>
                                 <th>Duration</th>
                                 <th class="text-end">Actions</th>
                             </tr>
@@ -111,13 +118,21 @@
                             @foreach ($recentSessions as $session)
                                 <tr>
                                     <td class="fw-semibold">{{ $session->readingMaterial->title }}</td>
-                                    <td class="text-muted">{{ optional($session->readingMaterial->author)->name ?? '-' }}</td>
-                                    <td><span class="badge bg-secondary">{{ optional($session->readingMaterial->category)->name ?? '-' }}</span></td>
-                                    <td class="text-muted">{{ $session->start_time?->format('H:i') ?? '—' }}</td>
-                                    <td class="text-muted">{{ $session->end_time?->format('H:i') ?? '—' }}</td>
+                                    <td class="text-muted">{{ $session->session_date?->format('M j, Y') ?? '—' }}</td>
+                                    <td class="text-muted">{{ $session->start_time?->format('g:i A') ?? '—' }}</td>
+                                    <td class="text-muted">{{ $session->end_time?->format('g:i A') ?? '—' }}</td>
                                     <td>
                                         @if ($session->duration_minutes)
-                                            {{ $session->duration_minutes }} min
+                                            @php
+                                                $d = $session->duration_minutes;
+                                                $hrs = intdiv($d, 60);
+                                                $mins = $d % 60;
+                                            @endphp
+                                            @if ($hrs > 0)
+                                                {{ $hrs }}h {{ $mins }}m
+                                            @else
+                                                {{ $mins }} min
+                                            @endif
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif
@@ -162,21 +177,12 @@
     if (!section) return;
 
     const status = section.dataset.status;
-    const startStr = section.dataset.start;
-    const endStr = section.dataset.end;
+    let elapsed = parseInt(section.dataset.elapsed, 10) || 0;
+    if (elapsed < 0) elapsed = 0;
     const display = document.getElementById('timer-display');
 
-    function parseTime(str) {
-        const parts = str.split(':');
-        const now = new Date();
-        now.setHours(parseInt(parts[0], 10));
-        now.setMinutes(parseInt(parts[1], 10));
-        now.setSeconds(parseInt(parts[2] || '0', 10));
-        now.setMilliseconds(0);
-        return now;
-    }
-
     function formatElapsed(seconds) {
+        if (seconds < 0) seconds = 0;
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
         const s = Math.floor(seconds % 60);
@@ -185,31 +191,22 @@
                String(s).padStart(2, '0');
     }
 
-    function getElapsedSeconds() {
-        const now = new Date();
-        const start = parseTime(startStr);
-
-        if (status === 'Paused' && endStr) {
-            const end = parseTime(endStr);
-            return (end - start) / 1000;
-        }
-
-        if (status === 'Active') {
-            let elapsed = (now - start) / 1000;
-            if (elapsed < 0) elapsed = 0;
-            return elapsed;
-        }
-
-        return 0;
-    }
-
-    let elapsed = getElapsedSeconds();
     display.textContent = formatElapsed(elapsed);
+
+    function syncElapsed() {
+        const secs = Math.floor(elapsed);
+        const pauseInput = document.getElementById('pause-elapsed');
+        const finishInput = document.getElementById('finish-elapsed');
+        if (pauseInput) pauseInput.value = secs;
+        if (finishInput) finishInput.value = secs;
+    }
+    syncElapsed();
 
     if (status === 'Active') {
         setInterval(function() {
             elapsed += 1;
             display.textContent = formatElapsed(elapsed);
+            syncElapsed();
         }, 1000);
     }
 })();

@@ -17,6 +17,7 @@ class ReadingSession extends Model
         'pages_read',
         'notes',
         'status',
+        'total_seconds',
     ];
 
     protected function casts(): array

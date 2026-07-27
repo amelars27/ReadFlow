@@ -13,102 +13,154 @@
         </div>
     @endif
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center">
-            <h6 class="mb-0 fw-semibold">All Reading Goals</h6>
-            <a href="{{ route('reading-goals.create') }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-lg me-1"></i>Add New
-            </a>
-        </div>
-        <div class="card-body p-0">
-            @if ($readingGoals->count())
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Title</th>
-                                <th>Goal Type</th>
-                                <th>Target</th>
-                                <th>Current</th>
-                                <th>Progress</th>
-                                <th>Status</th>
-                                <th>End Date</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($readingGoals as $goal)
-                                <tr>
-                                    <td class="fw-semibold">{{ $goal->readingMaterial->title }}</td>
-                                    <td><span class="badge bg-secondary">{{ ucfirst($goal->goal_type) }}</span></td>
-                                    @php
-                                        $totalPages = $goal->readingMaterial->total_pages ?? 0;
-                                        $currentPage = $goal->readingMaterial->current_page ?? 0;
-                                        $progress = $totalPages > 0
-                                            ? min(100, round(($currentPage / $totalPages) * 100))
-                                            : 0;
-                                        $progressBarClass = match (true) {
-                                            $progress >= 100 => 'bg-success',
-                                            $progress >= 50 => 'bg-primary',
-                                            $progress >= 25 => 'bg-info',
-                                            default => 'bg-secondary',
-                                        };
-                                    @endphp
-                                    <td>{{ $totalPages ?: '—' }}</td>
-                                    <td>{{ $currentPage }}</td>
-                                    <td style="min-width: 140px;">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="progress flex-grow-1" style="height: 8px;">
-                                                <div class="progress-bar {{ $progressBarClass }}"
-                                                     role="progressbar"
-                                                     style="width: {{ $progress }}%"
-                                                     aria-valuenow="{{ $progress }}"
-                                                     aria-valuemin="0"
-                                                     aria-valuemax="100">
-                                                </div>
-                                            </div>
-                                            <small class="text-muted">{{ $progress }}%</small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        @php
-                                            $statusBadge = $goal->status === 'completed' ? 'success' : 'primary';
-                                        @endphp
-                                        <span class="badge bg-{{ $statusBadge }}">{{ ucfirst($goal->status) }}</span>
-                                    </td>
-                                    <td class="text-muted">{{ $goal->end_date->format('M d, Y') }}</td>
-                                    <td class="text-end">
-                                        <a href="{{ route('reading-goals.edit', $goal) }}" class="btn btn-outline-primary btn-sm me-1">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <form action="{{ route('reading-goals.destroy', $goal) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm"
-                                                    onclick="return confirm('Are you sure you want to delete this reading goal?')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted mb-0">
+            <i class="bi bi-bullseye me-1"></i>{{ $readingGoals->total() }} goal{{ $readingGoals->total() !== 1 ? 's' : '' }}
+        </p>
+        <a href="{{ route('reading-goals.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Add New
+        </a>
+    </div>
+
+    @if ($readingGoals->count())
+        <div class="row g-4">
+            @foreach ($readingGoals as $goal)
+                @php
+                    $material = $goal->readingMaterial;
+                    $totalPages = $material->total_pages ?? 0;
+                    $currentPage = $material->current_page ?? 0;
+                    $progress = $totalPages > 0 ? min(100, round(($currentPage / $totalPages) * 100)) : 0;
+                    $remaining = $totalPages > 0 ? max(0, $totalPages - $currentPage) : 0;
+                    $progressBarClass = match (true) {
+                        $progress >= 100 => 'bg-success',
+                        $progress >= 50 => 'bg-primary',
+                        $progress >= 25 => 'bg-info',
+                        default => 'bg-secondary',
+                    };
+
+                    $sessions = $material->readingSessions;
+                    $totalSessions = $sessions->count();
+                    $lastSession = $sessions->sortByDesc('created_at')->first();
+                    $lastDuration = $lastSession?->duration_minutes;
+                    $totalSeconds = $sessions->sum('total_seconds');
+                    $totalMin = intdiv($totalSeconds, 60);
+                    $totalHrs = intdiv($totalMin, 60);
+                    $totalMins = $totalMin % 60;
+
+                    $goalStatusBadge = $goal->status === 'completed' ? 'success' : 'primary';
+                    $readingStatusBadge = match ($material->status->value) {
+                        'Completed' => 'success',
+                        'Reading' => 'warning',
+                        default => 'secondary',
+                    };
+                @endphp
+
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <div class="text-center mb-3">
+                                @if ($material->cover_image)
+                                    <div class="rounded-3 overflow-hidden d-flex align-items-center justify-content-center mx-auto" style="width: 72px; height: 72px;">
+                                        <img src="{{ Storage::url($material->cover_image) }}"
+                                             alt="{{ $material->title }} cover"
+                                             class="img-fluid"
+                                             style="width: 72px; height: 72px; object-fit: cover;">
+                                    </div>
+                                @else
+                                    <div class="bg-light rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 72px; height: 72px;">
+                                        <i class="bi bi-book-half fs-2 text-primary"></i>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <h6 class="fw-semibold text-center mb-1">{{ $material->title }}</h6>
+                            <p class="small text-muted text-center mb-3">{{ $material->author->name }}</p>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>{{ $currentPage }} / {{ $totalPages ?: '—' }} pages</span>
+                                    <span>{{ $progress }}%</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar {{ $progressBarClass }}"
+                                         role="progressbar"
+                                         style="width: {{ $progress }}%"
+                                         aria-valuenow="{{ $progress }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                @if ($remaining > 0)
+                                    <div class="text-end small text-muted mt-1">{{ $remaining }} pages remaining</div>
+                                @elseif ($totalPages > 0)
+                                    <div class="text-end small text-success mt-1">All pages read</div>
+                                @endif
+                            </div>
+
+                            <div class="bg-light rounded-3 p-2 mb-3 small">
+                                @if ($totalSessions > 0)
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted">Last Session:</span>
+                                        <span class="fw-semibold">{{ $lastDuration }} min</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted">Total Time:</span>
+                                        <span class="fw-semibold">
+                                            @if ($totalHrs > 0)
+                                                {{ $totalHrs }}h {{ $totalMins }}m
+                                            @else
+                                                {{ $totalMins }} min
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Sessions:</span>
+                                        <span class="fw-semibold">{{ $totalSessions }}</span>
+                                    </div>
+                                @else
+                                    <div class="text-center text-muted">No reading sessions yet.</div>
+                                @endif
+                            </div>
+
+                            <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+                                <span class="badge bg-{{ $goalStatusBadge }}">{{ ucfirst($goal->status) }}</span>
+                                <span class="badge bg-{{ $readingStatusBadge }}">{{ $material->status->value }}</span>
+                                <span class="badge bg-secondary">{{ ucfirst($goal->goal_type) }}</span>
+                            </div>
+
+                            <div class="text-center small text-muted mb-3">
+                                <i class="bi bi-calendar3 me-1"></i>Target: {{ $goal->end_date->format('M d, Y') }}
+                            </div>
+
+                            <div class="mt-auto d-flex justify-content-center gap-2 flex-wrap">
+                                <a href="{{ route('reading-materials.show', $material) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-book me-1"></i>View Book
+                                </a>
+                                <form action="{{ route('reading-sessions.start', $material) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="bi bi-play-fill me-1"></i>Start Reading
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            @else
-                <div class="text-center py-5 text-muted">
-                    <i class="bi bi-bullseye fs-1 d-block mb-3"></i>
-                    <p class="mb-0">No reading goals yet.</p>
-                    <a href="{{ route('reading-goals.create') }}" class="btn btn-primary mt-3">
-                        <i class="bi bi-plus-lg me-1"></i>Create Your First Reading Goal
-                    </a>
-                </div>
-            @endif
+            @endforeach
         </div>
+
         @if ($readingGoals->hasPages())
-            <div class="card-footer bg-transparent border-top">
+            <div class="mt-4">
                 {{ $readingGoals->links() }}
             </div>
         @endif
-    </div>
+    @else
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-bullseye fs-1 d-block mb-3"></i>
+            <p class="mb-0">No reading goals yet.</p>
+            <a href="{{ route('reading-goals.create') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-lg me-1"></i>Create Your First Reading Goal
+            </a>
+        </div>
+    @endif
 @endsection

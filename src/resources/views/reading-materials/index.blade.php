@@ -13,108 +13,105 @@
         </div>
     @endif
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center">
-            <h6 class="mb-0 fw-semibold">All Reading Materials</h6>
-            <a href="{{ route('reading-materials.create') }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-lg me-1"></i>Add New
-            </a>
-        </div>
-        <div class="card-body p-0">
-            @if ($readingMaterials->count())
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Title</th>
-                                <th>Author</th>
-                                <th>Category</th>
-                                <th>Source</th>
-                                <th>Pages</th>
-                                <th>Status</th>
-                                <th class="text-center">Bookmark</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($readingMaterials as $material)
-                                <tr>
-                                    <td>
-                                        <a href="{{ route('reading-materials.show', $material) }}" class="text-decoration-none fw-semibold">
-                                            {{ $material->title }}
-                                        </a>
-                                    </td>
-                                    <td class="text-muted">{{ $material->author->name }}</td>
-                                    <td><span class="badge bg-secondary">{{ $material->category->name }}</span></td>
-                                    <td><span class="badge bg-info">{{ $material->source_type->value }}</span></td>
-                                    <td>{{ $material->total_pages ?? '—' }}</td>
-                                    <td>
-                                        @php
-                                            $statusBadge = match ($material->status->value) {
-                                                'Completed' => 'success',
-                                                'Reading' => 'warning',
-                                                default => 'secondary',
-                                            };
-                                        @endphp
-                                        <span class="badge bg-{{ $statusBadge }}">{{ $material->status->value }}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        @if (isset($bookmarks[$material->id]))
-                                            <form action="{{ route('bookmarks.destroy', $bookmarks[$material->id]) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-warning" title="Remove Bookmark">
-                                                    <i class="bi bi-bookmark-fill"></i>
-                                                </button>
-                                            </form>
-                                        @else
-                                            <form action="{{ route('bookmarks.store') }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="reading_material_id" value="{{ $material->id }}">
-                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Add Bookmark">
-                                                    <i class="bi bi-bookmark"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </td>
-                                    <td class="text-end">
-                                        <form action="{{ route('reading-sessions.start', $material) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-success me-1" title="Start Reading">
-                                                <i class="bi bi-play-fill me-1"></i>Start
-                                            </button>
-                                        </form>
-                                        <a href="{{ route('reading-materials.edit', $material) }}" class="btn btn-outline-primary btn-sm me-1">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <form action="{{ route('reading-materials.destroy', $material) }}" method="POST" class="d-inline">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted mb-0">
+            <i class="bi bi-collection me-1"></i>{{ $readingMaterials->total() }} material{{ $readingMaterials->total() !== 1 ? 's' : '' }}
+        </p>
+        <a href="{{ route('reading-materials.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Add New
+        </a>
+    </div>
+
+    @if ($readingMaterials->count())
+        <div class="row g-4">
+            @foreach ($readingMaterials as $material)
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <div class="text-center mb-3">
+                                <div class="bg-light rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                                    <i class="bi bi-book-half fs-2 text-primary"></i>
+                                </div>
+                            </div>
+
+                            <h6 class="fw-semibold text-center mb-1">{{ $material->title }}</h6>
+                            <p class="small text-muted text-center mb-2">{{ $material->author->name }}</p>
+
+                            <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+                                <span class="badge bg-secondary">{{ $material->category->name }}</span>
+                                @if ($material->total_pages)
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-file-text me-1"></i>{{ $material->total_pages }} pages
+                                    </span>
+                                @endif
+                                @php
+                                    $statusBadge = match ($material->status->value) {
+                                        'Completed' => 'success',
+                                        'Reading' => 'warning',
+                                        default => 'secondary',
+                                    };
+                                @endphp
+                                <span class="badge bg-{{ $statusBadge }}">{{ $material->status->value }}</span>
+                            </div>
+
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-center gap-2 mb-2">
+                                    @if (isset($bookmarks[$material->id]))
+                                        <form action="{{ route('bookmarks.destroy', $bookmarks[$material->id]) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm"
-                                                    onclick="return confirm('Are you sure you want to delete this reading material?')">
-                                                <i class="bi bi-trash"></i>
+                                            <button type="submit" class="btn btn-sm btn-warning" title="Remove Bookmark">
+                                                <i class="bi bi-bookmark-fill"></i>
                                             </button>
                                         </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                    @else
+                                        <form action="{{ route('bookmarks.store') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="reading_material_id" value="{{ $material->id }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Add Bookmark">
+                                                <i class="bi bi-bookmark"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                    <form action="{{ route('reading-sessions.start', $material) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-success" title="Start Reading">
+                                            <i class="bi bi-play-fill me-1"></i>Start
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a href="{{ route('reading-materials.edit', $material) }}" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ route('reading-materials.destroy', $material) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('Are you sure you want to delete this reading material?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            @else
-                <div class="text-center py-5 text-muted">
-                    <i class="bi bi-book fs-1 d-block mb-3"></i>
-                    <p class="mb-0">No reading materials yet.</p>
-                    <a href="{{ route('reading-materials.create') }}" class="btn btn-primary mt-3">
-                        <i class="bi bi-plus-lg me-1"></i>Add Your First Reading Material
-                    </a>
-                </div>
-            @endif
+            @endforeach
         </div>
+
         @if ($readingMaterials->hasPages())
-            <div class="card-footer bg-transparent border-top">
+            <div class="mt-4">
                 {{ $readingMaterials->links() }}
             </div>
         @endif
-    </div>
+    @else
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-book fs-1 d-block mb-3"></i>
+            <p class="mb-0">No reading materials yet.</p>
+            <a href="{{ route('reading-materials.create') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-lg me-1"></i>Add Your First Reading Material
+            </a>
+        </div>
+    @endif
 @endsection

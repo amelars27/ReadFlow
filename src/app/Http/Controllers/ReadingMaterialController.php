@@ -10,6 +10,8 @@ use App\Models\Author;
 use App\Models\Bookmark;
 use App\Models\Category;
 use App\Models\ReadingMaterial;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ReadingMaterialController extends Controller
 {
@@ -86,6 +88,26 @@ class ReadingMaterialController extends Controller
 
         return redirect()->route('reading-materials.index')
             ->with('success', 'Reading material deleted successfully.');
+    }
+
+    public function updateCover(Request $request, ReadingMaterial $readingMaterial)
+    {
+        $this->authorizeAccess($readingMaterial);
+
+        $request->validate([
+            'cover_image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        if ($readingMaterial->cover_image) {
+            Storage::disk('public')->delete($readingMaterial->cover_image);
+        }
+
+        $path = $request->file('cover_image')->store('covers', 'public');
+
+        $readingMaterial->update(['cover_image' => $path]);
+
+        return redirect()->route('reading-materials.show', $readingMaterial)
+            ->with('success', 'Cover image uploaded successfully.');
     }
 
     private function authorizeAccess(ReadingMaterial $readingMaterial): void

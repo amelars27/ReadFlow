@@ -32,9 +32,18 @@
                          style="cursor: pointer;">
                         <div class="card-body d-flex flex-column">
                             <div class="text-center mb-3">
-                                <div class="bg-light rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
-                                    <i class="bi bi-book-half fs-2 text-primary"></i>
-                                </div>
+                                @if ($material->cover_image)
+                                    <div class="rounded-3 overflow-hidden d-flex align-items-center justify-content-center mx-auto" style="width: 64px; height: 64px;">
+                                        <img src="{{ Storage::url($material->cover_image) }}"
+                                             alt="{{ $material->title }} cover"
+                                             class="img-fluid"
+                                             style="width: 64px; height: 64px; object-fit: cover;">
+                                    </div>
+                                @else
+                                    <div class="bg-light rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                                        <i class="bi bi-book-half fs-2 text-primary"></i>
+                                    </div>
+                                @endif
                             </div>
 
                             <h6 class="fw-semibold text-center mb-1">{{ $material->title }}</h6>

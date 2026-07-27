@@ -8,11 +8,30 @@
     <div class="row g-4">
         <div class="col-md-4 col-lg-3">
             <div class="card border-0 shadow-sm">
-                <div class="card-body text-center py-5">
-                    <div class="bg-light rounded-3 d-inline-flex align-items-center justify-content-center"
-                         style="width: 120px; height: 120px;">
-                        <i class="bi bi-book-half fs-1 text-primary"></i>
-                    </div>
+                <div class="card-body text-center p-4">
+                    <form action="{{ route('reading-materials.cover', $readingMaterial) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" name="cover_image" id="cover_image" hidden accept="image/*">
+                        @if ($readingMaterial->cover_image)
+                            <div id="cover-placeholder"
+                                 role="button"
+                                 style="cursor: pointer; min-height: 260px;"
+                                 class="rounded-3 d-flex align-items-center justify-content-center overflow-hidden transition-shadow">
+                                <img src="{{ Storage::url($readingMaterial->cover_image) }}"
+                                     alt="{{ $readingMaterial->title }} cover"
+                                     class="img-fluid rounded-3"
+                                     style="max-height: 260px; object-fit: contain;">
+                            </div>
+                        @else
+                            <div id="cover-placeholder"
+                                 role="button"
+                                 style="cursor: pointer; min-height: 260px;"
+                                 class="bg-light rounded-3 d-flex flex-column align-items-center justify-content-center transition-shadow">
+                                <i class="bi bi-book-half fs-1 text-primary mb-2"></i>
+                                <span class="small text-muted">Click to Upload Cover</span>
+                            </div>
+                        @endif
+                    </form>
                 </div>
             </div>
         </div>
@@ -92,3 +111,27 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    const placeholder = document.getElementById('cover-placeholder');
+    const fileInput = document.getElementById('cover_image');
+
+    if (placeholder && fileInput) {
+        placeholder.addEventListener('mouseenter', function() {
+            this.classList.add('shadow');
+        });
+        placeholder.addEventListener('mouseleave', function() {
+            this.classList.remove('shadow');
+        });
+        placeholder.addEventListener('click', function() {
+            fileInput.click();
+        });
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                this.form.submit();
+            }
+        });
+    }
+</script>
+@endpush

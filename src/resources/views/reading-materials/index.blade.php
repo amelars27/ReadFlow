@@ -26,7 +26,10 @@
         <div class="row g-4">
             @foreach ($readingMaterials as $material)
                 <div class="col-sm-6 col-lg-4 col-xl-3">
-                    <div class="card border-0 shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100"
+                         data-href="{{ route('reading-materials.show', $material) }}"
+                         role="button"
+                         style="cursor: pointer;">
                         <div class="card-body d-flex flex-column">
                             <div class="text-center mb-3">
                                 <div class="bg-light rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
@@ -115,3 +118,16 @@
         </div>
     @endif
 @endsection
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.card[data-href]').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+            if (e.target.closest('a') || e.target.closest('button') || e.target.closest('form') || e.target.closest('input')) {
+                return;
+            }
+            window.location.href = card.dataset.href;
+        });
+    });
+</script>
+@endpush

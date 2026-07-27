@@ -23,8 +23,8 @@ class ReadingSession extends Model
     {
         return [
             'session_date' => 'date',
-            'start_time' => 'datetime:H:i',
-            'end_time' => 'datetime:H:i',
+            'start_time' => 'datetime:H:i:s',
+            'end_time' => 'datetime:H:i:s',
         ];
     }
 
@@ -41,6 +41,16 @@ class ReadingSession extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'Active');
+    }
+
+    public function scopePaused($query)
+    {
+        return $query->where('status', 'Paused');
+    }
+
+    public function scopeInProgress($query)
+    {
+        return $query->whereIn('status', ['Active', 'Paused']);
     }
 
     public function scopeCompleted($query)

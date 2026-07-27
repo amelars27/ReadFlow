@@ -22,6 +22,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('authors', AuthorController::class);
     Route::post('reading-sessions/start/{readingMaterial}', [ReadingSessionController::class, 'start'])->name('reading-sessions.start');
+    Route::post('reading-sessions/pause/{readingSession}', [ReadingSessionController::class, 'pause'])->name('reading-sessions.pause');
+    Route::post('reading-sessions/resume/{readingSession}', [ReadingSessionController::class, 'resume'])->name('reading-sessions.resume');
+    Route::post('reading-sessions/finish/{readingSession}', [ReadingSessionController::class, 'finish'])->name('reading-sessions.finish');
     Route::resource('reading-sessions', ReadingSessionController::class);
     Route::resource('reading-notes', ReadingNoteController::class);
     Route::resource('reading-goals', ReadingGoalController::class);

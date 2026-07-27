@@ -7,8 +7,8 @@
 ## LAST SESSION STATUS
 
 - **Tanggal**: 27 Juli 2026
-- **Phase**: Phase 10 — Reading Sessions Redesign ✅
-- **Status**: Reading Sessions di-redesign dengan Current Session + Recent Sessions. "Start Reading" button ditambahkan ke Reading Materials. Migration `status` column sudah dibuat.
+- **Phase**: Phase 11 — Focus Reading Experience ✅
+- **Status**: Reading Sessions diubah menjadi Focus Reading dengan timer display besar, Pause/Resume/Finish, dan Recent Sessions. Start Reading sekarang bisa resume session yang di-pause.
 
 ---
 
@@ -86,19 +86,20 @@
 - [x] Sidebar — semua 8 menu sudah mengarah ke route yang benar
 - [x] All modules tested: Dashboard, Reading Materials, Categories, Authors, Reading Sessions, Reading Notes, Reading Goals, Bookmarks
 
-### Reading Sessions Redesign (Phase 10) ✅
-- [x] Migration — add `status` column (string, default 'Active') ke reading_sessions
-- [x] Model — add `status` ke fillable, scope `active()` dan `completed()`
-- [x] Controller — `index()` diubah: passing `activeSession` + `recentSessions` (completed, paginated 10)
-- [x] Controller — method `start()`: cek existing active session, jika ada return error, jika tidak create session baru dengan status Active
-- [x] Routes — tambah route POST `reading-sessions/start/{readingMaterial}`
-- [x] Reading Materials index — tambah button "▶ Start" di kolom Actions
-- [x] Reading Materials show — tambah button "▶ Start Reading" di samping Edit/Delete
-- [x] Reading Sessions index — redesign: Current Session card + Recent Sessions table
-- [x] Current Session — menampilkan active session (title, author, category, started at, status badge) atau "No active reading session" dengan link ke Reading Materials
-- [x] Current Session — placeholder buttons: Pause (disabled), Finish Reading (disabled)
-- [x] Recent Sessions — tabel dengan kolom: Reading Material, Author, Category, Started At, Finished At, Status, Actions
-- [x] Error handling — flash message error jika user mencoba start session baru saat masih ada active session
+### Focus Reading Experience (Phase 11) ✅
+- [x] Model — tambah scope `paused()`, `inProgress()` (Active + Paused)
+- [x] Model — ubah cast `start_time`/`end_time` ke `datetime:H:i:s` (termasuk detik)
+- [x] Controller — `start()` diubah: resume session Paused untuk material yang sama, atau error jika material berbeda
+- [x] Controller — method `pause()`: set status 'Paused', catat end_time
+- [x] Controller — method `resume()`: adjust start_time untuk akumulasi pause duration, balik ke 'Active'
+- [x] Controller — method `finish()`: set status 'Completed', hitung duration_minutes dari start_time ke end_time
+- [x] Routes — tambah POST `reading-sessions/pause/{readingSession}`, `resume/{readingSession}`, `finish/{readingSession}`
+- [x] View — redesign total: Focus Reading timer display (display-1, centered)
+- [x] View — title + author ditampilkan di atas timer
+- [x] View — Pause/Resume + Finish Reading buttons (live, tidak disabled)
+- [x] View — Recent Sessions table dengan Duration column
+- [x] JS Timer — client-side timer membaca start_time/end_time dari DB, update realtime tanpa write ke DB
+- [x] JS Timer — Paused state menampilkan elapsed time statis
 
 ---
 
@@ -123,7 +124,7 @@ Profile           → placeholder (footer)
 | `/` | Guest | ✅ Redirect to login |
 | `/dashboard` | auth+verified | ✅ DashboardController@index |
 | `/reading-materials/*` | auth+verified | ✅ Resource (7 routes) |
-| `/reading-sessions/*` | auth+verified | ✅ Resource (7 routes) + start |
+| `/reading-sessions/*` | auth+verified | ✅ Resource (7 routes) + start + pause + resume + finish |
 | `/reading-notes/*` | auth+verified | ✅ Resource (7 routes) |
 | `/reading-goals/*` | auth+verified | ✅ Resource (7 routes) |
 | `/bookmarks` + POST + DELETE | auth+verified | ✅ Resource (3 routes) |
@@ -143,6 +144,5 @@ Profile           → placeholder (footer)
 
 ## NEXT TASKS (Belum dikerjakan)
 
-### Segera — Phase 11:
-- [ ] Reading Timer feature (Pause, Finish Reading)
+### Segera — Phase 12:
 - [ ] Bersihkan legacy requests (StoreMovieRequest, UpdateMovieRequest, StoreGenreRequest, UpdateGenreRequest)

@@ -58,7 +58,7 @@
 | `ReadingMaterial` | user_id, category_id, author_id, title, source_type, source_url, description, total_pages, total_reading_minutes, status, cover_image | BelongsTo user, category, author · HasMany readingSessions, readingNotes, bookmarks |
 | `Category` | name, description | HasMany readingMaterials |
 | `Author` | name, biography | HasMany readingMaterials |
-| `ReadingSession` | user_id, reading_material_id, session_date, start_time, end_time, duration_minutes, pages_read, notes, status | BelongsTo user, readingMaterial · scopes: active(), completed() |
+| `ReadingSession` | user_id, reading_material_id, session_date, start_time, end_time, duration_minutes, pages_read, notes, status | BelongsTo user, readingMaterial · scopes: active(), paused(), inProgress(), completed() |
 | `ReadingNote` | user_id, reading_material_id, title, summary, insight, favorite_quote, rating | BelongsTo user, readingMaterial · casts: rating (integer) |
 | `ReadingGoal` | user_id, daily_target_minutes, weekly_target_minutes, yearly_target_books | BelongsTo user |
 | `Bookmark` | user_id, reading_material_id | BelongsTo user, readingMaterial — menyimpan material untuk quick access |
@@ -70,7 +70,7 @@
 | Controller | Actions |
 |------------|---------|
 | `ReadingMaterialController` | index, create, store, show, edit, update, destroy (+ authorizeAccess private) |
-| `ReadingSessionController` | index, create, store, edit, update, destroy, start (+ authorizeAccess + authorizeAccessMaterial private) |
+| `ReadingSessionController` | index, create, store, edit, update, destroy, start, pause, resume, finish (+ authorizeAccess + authorizeAccessMaterial private) |
 | `ReadingNoteController` | index, create, store, edit, update, destroy (+ authorizeAccess private) |
 | `CategoryController` | index, create, store, edit, update, destroy |
 | `AuthorController` | index, create, store, edit, update, destroy |
@@ -154,6 +154,9 @@
 | GET/POST/PUT/DELETE | `/reading-materials` + `{readingMaterial}` | `reading-materials.*` (7 route) |
 | GET/POST/PUT/DELETE | `/reading-sessions` + `{readingSession}` | `reading-sessions.*` (7 route) |
 | POST | `/reading-sessions/start/{readingMaterial}` | `reading-sessions.start` |
+| POST | `/reading-sessions/pause/{readingSession}` | `reading-sessions.pause` |
+| POST | `/reading-sessions/resume/{readingSession}` | `reading-sessions.resume` |
+| POST | `/reading-sessions/finish/{readingSession}` | `reading-sessions.finish` |
 | GET/POST/PUT/DELETE | `/reading-notes` + `{readingNote}` | `reading-notes.*` (7 route) |
 | GET/POST/PUT/DELETE | `/categories` + `{category}` | `categories.*` (6 route) |
 | GET/POST/PUT/DELETE | `/authors` + `{author}` | `authors.*` (6 route) |
@@ -199,12 +202,14 @@ Profile           → (placeholder footer)
   - Author dropdown + button "+ New" (target _blank)
   - Source Type & Status dropdown (dari enum)
   - Form Request validation, flash messages, pagination
-- [x] **Reading Sessions** — redesigned with Current Session + Recent Sessions
-  - Current Session: menampilkan active session card (title, author, category, started at, status) atau "No active reading session"
-  - Recent Sessions: tabel completed sessions dengan kolom Author, Category, Started At, Finished At, Status
-  - "Start Reading" button (▶) di Reading Materials index dan show view
-  - Error handling jika user sudah memiliki active session
-  - Placeholder buttons: Pause, Finish Reading (disabled, menunggu timer)
+- [x] **Reading Sessions (Focus Reading)** — timer display besar, centered
+  - Current session: title + author di atas timer, Pause/Resume + Finish Reading buttons
+  - Start Reading: create session baru atau resume session Paused untuk material yang sama
+  - Pause: set status Paused, simpan end_time
+  - Resume: adjust start_time maju sesuai durasi pause
+  - Finish: set status Completed, hitung duration dari timestamps
+  - JS timer client-side: baca start_time/end_time dari DB, update realtime tanpa write ke DB
+  - Recent Sessions: tabel completed sessions dengan Duration, tombol delete
 - [x] **Reading Notes CRUD** — create, read, update, delete
   - Database: insight, favorite_quote, rating columns added via migration
   - Model: fillable + rating integer cast
@@ -230,5 +235,5 @@ Profile           → (placeholder footer)
 
 1. **DashboardController** — sudah dibersihkan dari legacy CineTrack, sekarang memakai ReadFlow models.
 2. **ProfileController error**: Referensi di routes tapi file mungkin tidak ada — ini isu pre-existing dari Breeze scaffold.
-3. **Reading Timer** — placeholder buttons (Pause, Finish Reading) sudah ada di Current Session card, disabled, menunggu implementasi Phase 11.
+3. **Focus Reading Timer** — sudah diimplementasi: large centered timer, client-side JS sync dari DB timestamps, Pause/Resume/Finish live.
 4. **Bookmarks** — fitur untuk menyimpan reading materials sebagai bookmark untuk quick access. Menggunakan bookmark icon (🔖) di Reading Materials index. Halaman Bookmarks menampilkan semua material yang di-bookmark.

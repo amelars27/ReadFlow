@@ -7,8 +7,8 @@
 ## LAST SESSION STATUS
 
 - **Tanggal**: 27 Juli 2026
-- **Phase**: Phase 8 — Dashboard & Reading Queue Stabilization ✅
-- **Status**: DashboardController dibersihkan dari legacy CineTrack, sekarang memakai ReadFlow models. Reading Queue (Bookmarks) berfungsi penuh. Semua modul terverifikasi.
+- **Phase**: Phase 10 — Reading Sessions Redesign ✅
+- **Status**: Reading Sessions di-redesign dengan Current Session + Recent Sessions. "Start Reading" button ditambahkan ke Reading Materials. Migration `status` column sudah dibuat.
 
 ---
 
@@ -86,16 +86,19 @@
 - [x] Sidebar — semua 8 menu sudah mengarah ke route yang benar
 - [x] All modules tested: Dashboard, Reading Materials, Categories, Authors, Reading Sessions, Reading Notes, Reading Goals, Bookmarks
 
-### Bookmarks Redesign — Final (Phase 8.5) ✅
-- [x] Bookmarks diubah dari "Reading Queue" menjadi fitur Bookmarks murni
-- [x] Reading Materials index — bookmark toggle button (🔖 `bi-bookmark`/`bi-bookmark-fill`)
-- [x] Bookmarks page — menampilkan bookmarked materials dengan cover, title, author, category
-- [x] Bookmarks page — tombol "View Material" dan "Remove Bookmark"
-- [x] Bookmarks page — subtitle "Save your bookmarked reading materials for quick access."
-- [x] Bookmarks page — Reading Timer button dihapus
-- [x] StoreBookmarkRequest — duplicate check dihapus (cukup validasi exists)
-- [x] Semua referensi "Reading Queue", "Favorites", heart icon (❤️) dihapus dari UI
-- [x] Konsistensi visual: bookmark icon (🔖) digunakan di semua tempat
+### Reading Sessions Redesign (Phase 10) ✅
+- [x] Migration — add `status` column (string, default 'Active') ke reading_sessions
+- [x] Model — add `status` ke fillable, scope `active()` dan `completed()`
+- [x] Controller — `index()` diubah: passing `activeSession` + `recentSessions` (completed, paginated 10)
+- [x] Controller — method `start()`: cek existing active session, jika ada return error, jika tidak create session baru dengan status Active
+- [x] Routes — tambah route POST `reading-sessions/start/{readingMaterial}`
+- [x] Reading Materials index — tambah button "▶ Start" di kolom Actions
+- [x] Reading Materials show — tambah button "▶ Start Reading" di samping Edit/Delete
+- [x] Reading Sessions index — redesign: Current Session card + Recent Sessions table
+- [x] Current Session — menampilkan active session (title, author, category, started at, status badge) atau "No active reading session" dengan link ke Reading Materials
+- [x] Current Session — placeholder buttons: Pause (disabled), Finish Reading (disabled)
+- [x] Recent Sessions — tabel dengan kolom: Reading Material, Author, Category, Started At, Finished At, Status, Actions
+- [x] Error handling — flash message error jika user mencoba start session baru saat masih ada active session
 
 ---
 
@@ -120,7 +123,7 @@ Profile           → placeholder (footer)
 | `/` | Guest | ✅ Redirect to login |
 | `/dashboard` | auth+verified | ✅ DashboardController@index |
 | `/reading-materials/*` | auth+verified | ✅ Resource (7 routes) |
-| `/reading-sessions/*` | auth+verified | ✅ Resource (7 routes) |
+| `/reading-sessions/*` | auth+verified | ✅ Resource (7 routes) + start |
 | `/reading-notes/*` | auth+verified | ✅ Resource (7 routes) |
 | `/reading-goals/*` | auth+verified | ✅ Resource (7 routes) |
 | `/bookmarks` + POST + DELETE | auth+verified | ✅ Resource (3 routes) |
@@ -140,6 +143,6 @@ Profile           → placeholder (footer)
 
 ## NEXT TASKS (Belum dikerjakan)
 
-### Segera — Phase 9:
-- [ ] Reading Timer feature
+### Segera — Phase 11:
+- [ ] Reading Timer feature (Pause, Finish Reading)
 - [ ] Bersihkan legacy requests (StoreMovieRequest, UpdateMovieRequest, StoreGenreRequest, UpdateGenreRequest)

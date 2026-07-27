@@ -6,17 +6,50 @@ use App\Http\Requests\StoreReadingSessionRequest;
 use App\Http\Requests\UpdateReadingSessionRequest;
 use App\Models\ReadingMaterial;
 use App\Models\ReadingSession;
+use Illuminate\Http\Request;
 
 class ReadingSessionController extends Controller
 {
     public function index()
     {
-        $readingSessions = ReadingSession::where('user_id', auth()->id())
-            ->with('readingMaterial')
+        $activeSession = ReadingSession::where('user_id', auth()->id())
+            ->with('readingMaterial.author', 'readingMaterial.category')
+            ->active()
             ->latest()
-            ->paginate(12);
+            ->first();
 
-        return view('reading-sessions.index', compact('readingSessions'));
+        $recentSessions = ReadingSession::where('user_id', auth()->id())
+            ->with('readingMaterial.author', 'readingMaterial.category')
+            ->completed()
+            ->latest()
+            ->paginate(10);
+
+        return view('reading-sessions.index', compact('activeSession', 'recentSessions'));
+    }
+
+    public function start(ReadingMaterial $readingMaterial)
+    {
+        $this->authorizeAccessMaterial($readingMaterial);
+
+        $existing = ReadingSession::where('user_id', auth()->id())
+            ->active()
+            ->first();
+
+        if ($existing) {
+            return redirect()->route('reading-sessions.index')
+                ->with('error', 'You already have an active reading session.');
+        }
+
+        ReadingSession::create([
+            'user_id' => auth()->id(),
+            'reading_material_id' => $readingMaterial->id,
+            'session_date' => now()->toDateString(),
+            'start_time' => now()->format('H:i'),
+            'status' => 'Active',
+        ]);
+
+        return redirect()->route('reading-sessions.index')
+            ->with('success', 'Reading session started successfully.');
     }
 
     public function create()
@@ -73,6 +106,13 @@ class ReadingSessionController extends Controller
     private function authorizeAccess(ReadingSession $readingSession): void
     {
         if ($readingSession->user_id !== auth()->id()) {
+            abort(403);
+        }
+    }
+
+    private function authorizeAccessMaterial(ReadingMaterial $readingMaterial): void
+    {
+        if ($readingMaterial->user_id !== auth()->id()) {
             abort(403);
         }
     }

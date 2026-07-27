@@ -78,6 +78,12 @@
                                         @endif
                                     </td>
                                     <td class="text-end">
+                                        <form action="{{ route('reading-sessions.start', $material) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-success me-1" title="Start Reading">
+                                                <i class="bi bi-play-fill me-1"></i>Start
+                                            </button>
+                                        </form>
                                         <a href="{{ route('reading-materials.edit', $material) }}" class="btn btn-outline-primary btn-sm me-1">
                                             <i class="bi bi-pencil"></i>
                                         </a>

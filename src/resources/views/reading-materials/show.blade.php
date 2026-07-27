@@ -17,6 +17,12 @@
                     </p>
                 </div>
                 <div class="d-flex gap-2">
+                    <form action="{{ route('reading-sessions.start', $readingMaterial) }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="bi bi-play-fill me-1"></i>Start Reading
+                        </button>
+                    </form>
                     <a href="{{ route('reading-materials.edit', $readingMaterial) }}" class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-pencil me-1"></i>Edit
                     </a>

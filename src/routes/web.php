@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('authors', AuthorController::class);
     Route::resource('reading-sessions', ReadingSessionController::class);
+    Route::post('reading-sessions/start/{readingMaterial}', [ReadingSessionController::class, 'start'])->name('reading-sessions.start');
     Route::resource('reading-notes', ReadingNoteController::class);
     Route::resource('reading-goals', ReadingGoalController::class);
     Route::resource('bookmarks', BookmarkController::class)->only(['index', 'store', 'destroy']);

@@ -16,6 +16,7 @@ class ReadingSession extends Model
         'duration_minutes',
         'pages_read',
         'notes',
+        'status',
     ];
 
     protected function casts(): array
@@ -35,5 +36,15 @@ class ReadingSession extends Model
     public function readingMaterial(): BelongsTo
     {
         return $this->belongsTo(ReadingMaterial::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'Active');
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', 'Completed');
     }
 }

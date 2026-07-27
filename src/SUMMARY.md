@@ -60,7 +60,7 @@
 | `ReadingSession` | user_id, reading_material_id, session_date, start_time, end_time, duration_minutes, pages_read, notes | BelongsTo user, readingMaterial |
 | `ReadingNote` | user_id, reading_material_id, title, summary, insight, favorite_quote, rating | BelongsTo user, readingMaterial · casts: rating (integer) |
 | `ReadingGoal` | user_id, daily_target_minutes, weekly_target_minutes, yearly_target_books | BelongsTo user |
-| `Bookmark` | user_id, reading_material_id | BelongsTo user, readingMaterial — Favorites concept (bukan Reading Queue) |
+| `Bookmark` | user_id, reading_material_id | BelongsTo user, readingMaterial — menyimpan material untuk quick access |
 
 ---
 
@@ -182,7 +182,7 @@ Authors         → authors.*
 Reading Sessions  → reading-sessions.*
 Reading Notes     → reading-notes.*
 Reading Goals     → reading-goals.* ✅
-Bookmarks (Favorites) → bookmarks.* ✅
+Bookmarks → bookmarks.* ✅
 Profile           → (placeholder footer)
 ```
 
@@ -216,8 +216,8 @@ Profile           → (placeholder footer)
   - Pagination 10, delete confirmation, flash messages
 - [x] **Authors CRUD** — create, read, update, delete
   - Pagination 10, delete confirmation, flash messages
-- [x] **Favorites (Bookmarks)** — add/remove favorite dengan heart icon di Reading Materials index
-  - Bookmarks page menampilkan favorite materials dengan cover, title, author, category
+- [x] **Bookmarks** — add/remove bookmark dengan bookmark icon (🔖) di Reading Materials index
+  - Bookmarks page menampilkan bookmarked materials dengan cover, title, author, category
   - Tombol "View Material" dan "Remove Bookmark"
 - [x] Responsive layout — sidebar offcanvas di mobile, fixed di desktop
 - [x] Light theme — Bootstrap 5 + Bootstrap Icons
@@ -229,4 +229,4 @@ Profile           → (placeholder footer)
 1. **DashboardController** — sudah dibersihkan dari legacy CineTrack, sekarang memakai ReadFlow models.
 2. **ProfileController error**: Referensi di routes tapi file mungkin tidak ada — ini isu pre-existing dari Breeze scaffold.
 3. **Belum diimplementasi**: Reading Timer — direncanakan untuk phase selanjutnya.
-4. **Bookmarks** — sudah di-redesain dari "Reading Queue" menjadi "Favorites". Heart icon (❤️) untuk toggle favorite di Reading Materials index. Halaman Bookmarks hanya menampilkan favorite materials.
+4. **Bookmarks** — fitur untuk menyimpan reading materials sebagai bookmark untuk quick access. Menggunakan bookmark icon (🔖) di Reading Materials index. Halaman Bookmarks menampilkan semua material yang di-bookmark.

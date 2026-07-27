@@ -1,8 +1,8 @@
 @extends('layouts.readflow')
 
-@section('title', 'Bookmarks')
+@section('title', '🔖 Bookmarks')
 
-@section('header', 'Bookmarks')
+@section('header', '🔖 Bookmarks')
 
 @section('content')
     @if (session('success'))
@@ -15,8 +15,11 @@
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-transparent border-bottom">
             <h5 class="mb-0 fw-semibold">
-                <i class="bi bi-heart me-2 text-danger"></i>Favorite Materials
+                <i class="bi bi-bookmark-fill me-2 text-warning"></i>Bookmarks
             </h5>
+            <p class="text-muted small mb-0 mt-1">
+                Save your bookmarked reading materials for quick access.
+            </p>
         </div>
 
         <div class="card-body">
@@ -74,8 +77,8 @@
                                                 <form action="{{ route('bookmarks.destroy', $bookmark) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button class="btn btn-outline-danger btn-sm">
-                                                        <i class="bi bi-heartbreak me-1"></i>Remove
+                                                    <button class="btn btn-outline-warning btn-sm">
+                                                        <i class="bi bi-bookmark-dash me-1"></i>Remove
                                                     </button>
                                                 </form>
                                             </div>
@@ -99,11 +102,10 @@
 
                 <div class="text-center py-5">
 
-                    <h5><i class="bi bi-heart text-danger me-2"></i>No favorites yet</h5>
+                    <h5><i class="bi bi-bookmark text-warning me-2"></i>No bookmarks yet</h5>
 
                     <p class="text-muted">
-                        Browse your reading materials and add your favorites by clicking the
-                        <i class="bi bi-heart text-danger"></i> button.
+                        Browse your reading materials and save them as bookmarks for quick access.
                     </p>
 
                     <a href="{{ route('reading-materials.index') }}" class="btn btn-primary">

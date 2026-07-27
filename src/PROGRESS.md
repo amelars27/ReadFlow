@@ -86,14 +86,16 @@
 - [x] Sidebar — semua 8 menu sudah mengarah ke route yang benar
 - [x] All modules tested: Dashboard, Reading Materials, Categories, Authors, Reading Sessions, Reading Notes, Reading Goals, Bookmarks
 
-### Bookmarks Redesign — Favorites Concept (Phase 8.5) ✅
-- [x] Bookmarks diubah dari "Reading Queue" menjadi "Favorites"
-- [x] Reading Materials index — button bookmark diganti heart icon (❤️)
-- [x] Bookmarks page — menampilkan favorite materials dengan cover, title, author, category
+### Bookmarks Redesign — Final (Phase 8.5) ✅
+- [x] Bookmarks diubah dari "Reading Queue" menjadi fitur Bookmarks murni
+- [x] Reading Materials index — bookmark toggle button (🔖 `bi-bookmark`/`bi-bookmark-fill`)
+- [x] Bookmarks page — menampilkan bookmarked materials dengan cover, title, author, category
 - [x] Bookmarks page — tombol "View Material" dan "Remove Bookmark"
+- [x] Bookmarks page — subtitle "Save your bookmarked reading materials for quick access."
 - [x] Bookmarks page — Reading Timer button dihapus
 - [x] StoreBookmarkRequest — duplicate check dihapus (cukup validasi exists)
-- [x] Semua referensi "Reading Queue" di UI dihapus
+- [x] Semua referensi "Reading Queue", "Favorites", heart icon (❤️) dihapus dari UI
+- [x] Konsistensi visual: bookmark icon (🔖) digunakan di semua tempat
 
 ---
 
@@ -108,7 +110,7 @@ Authors         → authors.* ✅
 Reading Sessions  → reading-sessions.* ✅
 Reading Notes     → reading-notes.* ✅
 Reading Goals     → reading-goals.* ✅
-Bookmarks (Favorites) → bookmarks.* ✅
+Bookmarks → bookmarks.* ✅
 Profile           → placeholder (footer)
 ```
 

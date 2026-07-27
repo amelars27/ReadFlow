@@ -1,8 +1,8 @@
 @extends('layouts.readflow')
 
-@section('title', '🔖 Bookmarks')
+@section('title', 'Bookmarks')
 
-@section('header', '🔖 Bookmarks')
+@section('header', 'Bookmarks')
 
 @section('content')
     @if (session('success'))

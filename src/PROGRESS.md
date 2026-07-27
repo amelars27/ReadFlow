@@ -6,9 +6,9 @@
 
 ## LAST SESSION STATUS
 
-- **Tanggal**: 26 Juli 2026
-- **Phase**: Phase 5 — Reading Notes CRUD ✅
-- **Status**: Database, Models, Controller, Form Requests, Routes, Blade Views, dan Sidebar Reading Notes selesai.
+- **Tanggal**: 27 Juli 2026
+- **Phase**: Phase 8 — Dashboard & Reading Queue Stabilization ✅
+- **Status**: DashboardController dibersihkan dari legacy CineTrack, sekarang memakai ReadFlow models. Reading Queue (Bookmarks) berfungsi penuh. Semua modul terverifikasi.
 
 ---
 
@@ -76,6 +76,25 @@
 - [x] Sidebar — menu Reading Notes aktif mengarah ke reading-notes.index
 - [x] Blade Views — index, create, edit, _form
 
+### Dashboard & Reading Queue Stabilization (Phase 8) ✅
+- [x] DashboardController — legacy CineTrack code (Movie/Genre) removed
+- [x] DashboardController — sekarang menggunakan model ReadingMaterial, ReadingSession, ReadingGoal, ReadingNote, Category
+- [x] Dashboard — statistics cards, progress bar, Chart.js doughnut & line charts, recent sessions, recent notes, active goals semuanya berfungsi
+- [x] Dashboard route — dari closure diganti ke `DashboardController@index`
+- [x] BookmarkController — index, store, destroy berfungsi
+- [x] Reading Materials index — heart button toggle (add/remove bookmark) terintegrasi
+- [x] Sidebar — semua 8 menu sudah mengarah ke route yang benar
+- [x] All modules tested: Dashboard, Reading Materials, Categories, Authors, Reading Sessions, Reading Notes, Reading Goals, Bookmarks
+
+### Bookmarks Redesign — Favorites Concept (Phase 8.5) ✅
+- [x] Bookmarks diubah dari "Reading Queue" menjadi "Favorites"
+- [x] Reading Materials index — button bookmark diganti heart icon (❤️)
+- [x] Bookmarks page — menampilkan favorite materials dengan cover, title, author, category
+- [x] Bookmarks page — tombol "View Material" dan "Remove Bookmark"
+- [x] Bookmarks page — Reading Timer button dihapus
+- [x] StoreBookmarkRequest — duplicate check dihapus (cukup validasi exists)
+- [x] Semua referensi "Reading Queue" di UI dihapus
+
 ---
 
 ## CURRENT STATE
@@ -88,8 +107,8 @@ Categories      → categories.* ✅
 Authors         → authors.* ✅
 Reading Sessions  → reading-sessions.* ✅
 Reading Notes     → reading-notes.* ✅
-Reading Goals     → placeholder #
-Bookmarks         → placeholder #
+Reading Goals     → reading-goals.* ✅
+Bookmarks (Favorites) → bookmarks.* ✅
 Profile           → placeholder (footer)
 ```
 
@@ -97,10 +116,12 @@ Profile           → placeholder (footer)
 | Route | Auth | Status |
 |-------|------|--------|
 | `/` | Guest | ✅ Redirect to login |
-| `/dashboard` | auth+verified | ✅ Closure |
+| `/dashboard` | auth+verified | ✅ DashboardController@index |
 | `/reading-materials/*` | auth+verified | ✅ Resource (7 routes) |
 | `/reading-sessions/*` | auth+verified | ✅ Resource (7 routes) |
 | `/reading-notes/*` | auth+verified | ✅ Resource (7 routes) |
+| `/reading-goals/*` | auth+verified | ✅ Resource (7 routes) |
+| `/bookmarks` + POST + DELETE | auth+verified | ✅ Resource (3 routes) |
 | `/categories/*` | auth+verified | ✅ Resource (6 routes — no show) |
 | `/authors/*` | auth+verified | ✅ Resource (6 routes — no show) |
 | `/profile/*` | auth | ✅ Breeze bawaan |
@@ -110,16 +131,13 @@ Profile           → placeholder (footer)
 
 ## KNOWN ISSUES
 
-1. **DashboardController** — legacy code (masih pakai Movie/Genre models). Tidak dipakai karena route dashboard pakai closure.
-2. **ProfileController** — referenced di routes tapi mungkin bermasalah. Pre-existing dari Breeze scaffold.
-3. **Legacy Requests**: `StoreMovieRequest`, `UpdateMovieRequest`, `StoreGenreRequest`, `UpdateGenreRequest` — tidak dipakai, aman dihapus nanti.
+1. **ProfileController** — referenced di routes tapi mungkin bermasalah. Pre-existing dari Breeze scaffold.
+2. **Legacy Requests**: `StoreMovieRequest`, `UpdateMovieRequest`, `StoreGenreRequest`, `UpdateGenreRequest` — tidak dipakai, aman dihapus nanti.
 
 ---
 
 ## NEXT TASKS (Belum dikerjakan)
 
-### Segera — Phase 6:
-- [ ] Reading Goals CRUD
-- [ ] Bookmarks CRUD
-- [ ] Dashboard real data (statistik dari database)
-- [ ] Bersihkan legacy code (DashboardController, Movie/Genre requests)
+### Segera — Phase 9:
+- [ ] Reading Timer feature
+- [ ] Bersihkan legacy requests (StoreMovieRequest, UpdateMovieRequest, StoreGenreRequest, UpdateGenreRequest)

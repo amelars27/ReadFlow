@@ -1,8 +1,8 @@
 @extends('layouts.readflow')
 
-@section('title', 'Reading Queue')
+@section('title', 'Bookmarks')
 
-@section('header', 'Reading Queue')
+@section('header', 'Bookmarks')
 
 @section('content')
     @if (session('success'))
@@ -13,8 +13,10 @@
     @endif
 
     <div class="card border-0 shadow-sm">
-        <div class="card-header">
-            <h5 class="mb-0">Reading Queue</h5>
+        <div class="card-header bg-transparent border-bottom">
+            <h5 class="mb-0 fw-semibold">
+                <i class="bi bi-heart me-2 text-danger"></i>Favorite Materials
+            </h5>
         </div>
 
         <div class="card-body">
@@ -28,45 +30,58 @@
 
                             <div class="card h-100">
 
-                                <div class="card-body">
+                                <div class="row g-0 h-100">
 
-                                    <h5>
-                                        {{ optional($bookmark->readingMaterial)->title ?? 'Unknown Material' }}
-                                    </h5>
-
-                                    <p class="text-muted mb-1">
-                                        Author :
-                                        {{ optional(optional($bookmark->readingMaterial)->author)->name ?? '-' }}
-                                    </p>
-
-                                    <p class="text-muted mb-2">
-                                        Category :
-                                        {{ optional(optional($bookmark->readingMaterial)->category)->name ?? '-' }}
-                                    </p>
-
-                                    @if($bookmark->created_at)
-                                        <small class="text-muted">
-                                            Added :
-                                            {{ $bookmark->created_at->format('M d, Y') }}
-                                        </small>
+                                    @if(optional($bookmark->readingMaterial)->cover_image)
+                                        <div class="col-md-4">
+                                            <img src="{{ $bookmark->readingMaterial->cover_image }}"
+                                                 alt="{{ $bookmark->readingMaterial->title }}"
+                                                 class="img-fluid rounded-start h-100"
+                                                 style="object-fit: cover;">
+                                        </div>
                                     @endif
 
-                                </div>
+                                    <div class="@if(optional($bookmark->readingMaterial)->cover_image) col-md-8 @else col-12 @endif">
+                                        <div class="card-body d-flex flex-column h-100">
 
-                                <div class="card-footer bg-white d-flex gap-2">
+                                            <h5 class="card-title">
+                                                {{ optional($bookmark->readingMaterial)->title ?? 'Unknown Material' }}
+                                            </h5>
 
-                                    <button class="btn btn-primary btn-sm flex-fill" disabled>
-                                        Reading Timer (Coming Soon)
-                                    </button>
+                                            <p class="text-muted mb-1">
+                                                <i class="bi bi-pencil me-1"></i>
+                                                {{ optional(optional($bookmark->readingMaterial)->author)->name ?? '-' }}
+                                            </p>
 
-                                    <form action="{{ route('bookmarks.destroy',$bookmark) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
+                                            <p class="text-muted mb-2">
+                                                <i class="bi bi-tag me-1"></i>
+                                                {{ optional(optional($bookmark->readingMaterial)->category)->name ?? '-' }}
+                                            </p>
 
-                                        <button class="btn btn-outline-danger btn-sm">
-                                            Remove
-                                        </button>
-                                    </form>
+                                            @if($bookmark->created_at)
+                                                <small class="text-muted mt-auto">
+                                                    <i class="bi bi-clock me-1"></i>
+                                                    Bookmarked on {{ $bookmark->created_at->format('M d, Y') }}
+                                                </small>
+                                            @endif
+
+                                            <div class="d-flex gap-2 mt-3">
+                                                <a href="{{ route('reading-materials.show', $bookmark->readingMaterial) }}"
+                                                   class="btn btn-primary btn-sm flex-fill">
+                                                    <i class="bi bi-eye me-1"></i>View Material
+                                                </a>
+
+                                                <form action="{{ route('bookmarks.destroy', $bookmark) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn btn-outline-danger btn-sm">
+                                                        <i class="bi bi-heartbreak me-1"></i>Remove
+                                                    </button>
+                                                </form>
+                                            </div>
+
+                                        </div>
+                                    </div>
 
                                 </div>
 
@@ -84,10 +99,11 @@
 
                 <div class="text-center py-5">
 
-                    <h5>Your reading queue is empty.</h5>
+                    <h5><i class="bi bi-heart text-danger me-2"></i>No favorites yet</h5>
 
                     <p class="text-muted">
-                        Bookmark your prioritized reading materials so they are ready for your next reading session.
+                        Browse your reading materials and add your favorites by clicking the
+                        <i class="bi bi-heart text-danger"></i> button.
                     </p>
 
                     <a href="{{ route('reading-materials.index') }}" class="btn btn-primary">

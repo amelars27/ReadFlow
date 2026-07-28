@@ -14,7 +14,7 @@ class ReadingGoalController extends Controller
         $readingGoals = ReadingGoal::where('user_id', auth()->id())
             ->with(['readingSessions' => function ($query) {
                 $query->where('status', 'Completed')
-                      ->select('id', 'reading_goal_id', 'duration_minutes', 'total_seconds', 'created_at');
+                      ->select('id', 'reading_goal_id', 'end_page', 'duration_minutes', 'total_seconds', 'created_at');
             }])
             ->latest()
             ->paginate(10);
@@ -48,7 +48,13 @@ class ReadingGoalController extends Controller
     {
         $this->authorizeAccess($readingGoal);
 
-        $readingGoal->load(['readingMaterial.author', 'readingMaterial.category']);
+        $readingGoal->load([
+            'readingMaterial.author',
+            'readingMaterial.category',
+            'readingSessions' => function ($query) {
+                $query->where('status', 'Completed');
+            },
+        ]);
 
         return view('reading-goals.show', compact('readingGoal'));
     }

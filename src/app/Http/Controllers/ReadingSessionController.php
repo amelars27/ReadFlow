@@ -68,10 +68,11 @@ class ReadingSessionController extends Controller
             return redirect()->route('reading-sessions.index');
         }
 
-        $totalSeconds = (int) $request->input('elapsed_seconds', 0);
+        $totalSeconds = max(0, (int) $request->input('elapsed_seconds', 0));
         if ($totalSeconds <= 0) {
             $totalSeconds = $readingSession->total_seconds + now()->diffInSeconds($readingSession->updated_at);
         }
+        $totalSeconds = max(0, $totalSeconds);
 
         $readingSession->update([
             'total_seconds' => $totalSeconds,
@@ -98,7 +99,7 @@ class ReadingSessionController extends Controller
         return redirect()->route('reading-sessions.index');
     }
 
-    public function finish(Request $request, ReadingSession $readingSession)
+    public function confirmFinish(Request $request, ReadingSession $readingSession)
     {
         $this->authorizeAccess($readingSession);
 
@@ -106,25 +107,57 @@ class ReadingSessionController extends Controller
             return redirect()->route('reading-sessions.index');
         }
 
+        $elapsed = max(0, (int) $request->query('elapsed', 0));
+        if ($elapsed < 0) $elapsed = 0;
+
+        return view('reading-sessions.finish', compact('readingSession', 'elapsed'));
+    }
+
+    public function finish(Request $request, ReadingSession $readingSession)
+    {
+
+        $this->authorizeAccess($readingSession);
+
+        if (!in_array($readingSession->status, ['Active', 'Paused'])) {
+            return redirect()->route('reading-sessions.index');
+        }
+
+        $validated = $request->validate([
+            'start_page' => 'required|integer|min:1',
+            'end_page' => 'required|integer|gte:start_page',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
         $endTime = now();
 
-        if ($readingSession->status === 'Active') {
-            $totalSeconds = (int) $request->input('elapsed_seconds', 0);
-            if ($totalSeconds > 0) {
-                $readingSession->total_seconds = $totalSeconds;
-            } else {
-                $readingSession->total_seconds += now()->diffInSeconds($readingSession->updated_at);
-            }
-        }
+        $totalSeconds = max(0, (int) $request->input('elapsed_seconds', 0));
+        $readingSession->total_seconds = $totalSeconds;
 
         $durationMinutes = (int) round($readingSession->total_seconds / 60);
 
         $readingSession->update([
+            'start_page' => $validated['start_page'],
+            'end_page' => $validated['end_page'],
+            'notes' => $validated['notes'],
             'total_seconds' => $readingSession->total_seconds,
             'end_time' => $endTime->format('H:i:s'),
             'duration_minutes' => max($durationMinutes, 0),
             'status' => 'Completed',
         ]);
+
+        $readingGoal = $readingSession->readingGoal;
+        if ($readingGoal) {
+            $maxPage = $readingGoal->readingSessions()
+                ->where('status', 'Completed')
+                ->max('end_page');
+
+            $totalPages = $readingGoal->readingMaterial?->total_pages ?? 0;
+
+            $readingGoal->update([
+                'current_value' => $maxPage ?: 0,
+                'status' => $maxPage && $totalPages && $maxPage >= $totalPages ? 'completed' : 'active',
+            ]);
+        }
 
         return redirect()
             ->route('reading-sessions.index')

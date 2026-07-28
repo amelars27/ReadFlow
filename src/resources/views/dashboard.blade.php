@@ -230,8 +230,27 @@
                                 <tbody>
                                     @foreach ($recentSessions as $session)
                                         <tr>
-                                            <td class="fw-semibold">{{ $session->readingMaterial->title }}</td>
-                                            <td>{{ $session->duration_minutes }} min</td>
+                                            <td class="fw-semibold">{{ $session->readingGoal?->readingMaterial?->title ?? '—' }}</td>
+                                            <td>
+                                                @php
+                                                    $dMin = $session->duration_minutes;
+                                                    $dSec = $session->total_seconds;
+                                                    $displayMin = $dMin ?? ($dSec > 0 ? intdiv($dSec, 60) : null);
+                                                @endphp
+                                                @if ($displayMin !== null)
+                                                    @php
+                                                        $hrs = intdiv($displayMin, 60);
+                                                        $mins = $displayMin % 60;
+                                                    @endphp
+                                                    @if ($hrs > 0)
+                                                        {{ $hrs }}h {{ $mins }}m
+                                                    @else
+                                                        {{ $mins }} min
+                                                    @endif
+                                                @else
+                                                    <span class="text-muted">—</span>
+                                                @endif
+                                            </td>
                                             <td class="text-muted">{{ $session->session_date->format('M d, Y') }}</td>
                                         </tr>
                                     @endforeach

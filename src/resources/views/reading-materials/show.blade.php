@@ -79,12 +79,9 @@
                     <hr class="my-3">
 
                     <div class="d-flex gap-2 flex-wrap">
-                        <form action="{{ route('reading-sessions.start', $readingMaterial) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-play-fill me-1"></i>Start Reading
-                            </button>
-                        </form>
+                        <a href="{{ route('reading-goals.create', ['reading_material_id' => $readingMaterial->id]) }}" class="btn btn-success">
+                            <i class="bi bi-bullseye me-1"></i>Set Reading Goal
+                        </a>
                         <form action="{{ route('bookmarks.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="reading_material_id" value="{{ $readingMaterial->id }}">

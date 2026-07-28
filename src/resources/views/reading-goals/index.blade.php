@@ -28,9 +28,9 @@
                 @php
                     $material = $goal->readingMaterial;
                     $totalPages = $material->total_pages ?? 0;
-                    $currentPage = $material->current_page ?? 0;
-                    $progress = $totalPages > 0 ? min(100, round(($currentPage / $totalPages) * 100)) : 0;
-                    $remaining = $totalPages > 0 ? max(0, $totalPages - $currentPage) : 0;
+                    $maxPage = $goal->readingSessions->max('end_page') ?? 0;
+                    $progress = $totalPages > 0 ? min(100, round(($maxPage / $totalPages) * 100)) : 0;
+                    $remaining = $totalPages > 0 ? max(0, $totalPages - $maxPage) : 0;
                     $progressBarClass = match (true) {
                         $progress >= 100 => 'bg-success',
                         $progress >= 50 => 'bg-primary',
@@ -41,10 +41,9 @@
                     $sessions = $goal->readingSessions;
                     $totalSessions = $sessions->count();
                     $lastSession = $sessions->sortByDesc('created_at')->first();
-                    $totalSeconds = $sessions->sum('total_seconds');
-                    $totalMin = intdiv($totalSeconds, 60);
-                    $totalHrs = intdiv($totalMin, 60);
-                    $totalMins = $totalMin % 60;
+                    $totalMinutes = $sessions->sum('duration_minutes');
+                    $totalHrs = intdiv($totalMinutes, 60);
+                    $totalMins = $totalMinutes % 60;
                 @endphp
 
                 <div class="col-sm-6 col-lg-4 col-xl-3">
@@ -81,7 +80,7 @@
                             {{-- 2. Reading Progress --}}
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between small text-muted mb-1">
-                                    <span>{{ $currentPage }} / {{ $totalPages ?: '—' }} pages</span>
+                                    <span>{{ $maxPage }} / {{ $totalPages ?: '—' }} pages</span>
                                     <span>{{ $progress }}%</span>
                                 </div>
                                 <div class="progress" style="height: 8px;">
@@ -141,8 +140,10 @@
                                             <span class="fw-semibold">
                                                 @if ($lastSession->duration_minutes)
                                                     {{ $lastSession->duration_minutes }} min
+                                                @elseif ($lastSession->total_seconds)
+                                                    {{ max(0, intdiv($lastSession->total_seconds, 60)) }} min
                                                 @else
-                                                    {{ $lastSession->created_at->diffForHumans() }}
+                                                    <span class="text-muted">—</span>
                                                 @endif
                                             </span>
                                         </div>

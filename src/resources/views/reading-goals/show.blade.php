@@ -8,9 +8,9 @@
     @php
         $material = $readingGoal->readingMaterial;
         $totalPages = $material->total_pages ?? 0;
-        $currentPage = $material->current_page ?? 0;
-        $progress = $totalPages > 0 ? min(100, round(($currentPage / $totalPages) * 100)) : 0;
-        $remaining = $totalPages > 0 ? max(0, $totalPages - $currentPage) : 0;
+        $maxPage = $readingGoal->readingSessions->max('end_page') ?? 0;
+        $progress = $totalPages > 0 ? min(100, round(($maxPage / $totalPages) * 100)) : 0;
+        $remaining = $totalPages > 0 ? max(0, $totalPages - $maxPage) : 0;
         $progressBarClass = match (true) {
             $progress >= 100 => 'bg-success',
             $progress >= 50 => 'bg-primary',
@@ -21,10 +21,9 @@
         $sessions = $readingGoal->readingSessions;
         $totalSessions = $sessions->count();
         $lastSession = $sessions->sortByDesc('created_at')->first();
-        $totalSeconds = $sessions->sum('total_seconds');
-        $totalMin = intdiv($totalSeconds, 60);
-        $totalHrs = intdiv($totalMin, 60);
-        $totalMins = $totalMin % 60;
+        $totalMinutes = $sessions->sum('duration_minutes');
+        $totalHrs = intdiv($totalMinutes, 60);
+        $totalMins = $totalMinutes % 60;
 
         $recentNotes = $material->readingNotes()->latest()->take(3)->get();
 
@@ -43,7 +42,9 @@
                 'title' => 'Reading Session',
                 'description' => $session->duration_minutes
                     ? 'Read for ' . $session->duration_minutes . ' min'
-                    : 'Session completed',
+                    : ($session->total_seconds
+                        ? 'Read for ' . max(0, intdiv($session->total_seconds, 60)) . ' min'
+                        : 'Session completed'),
                 'time' => $session->created_at,
             ];
         }
@@ -106,7 +107,7 @@
 
                     <div class="mb-3">
                         <div class="d-flex justify-content-between small text-muted mb-1">
-                            <span>{{ $currentPage }} / {{ $totalPages ?: '—' }} pages</span>
+                            <span>{{ $maxPage }} / {{ $totalPages ?: '—' }} pages</span>
                             <span>{{ $progress }}%</span>
                         </div>
                         <div class="progress" style="height: 8px;">

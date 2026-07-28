@@ -67,13 +67,11 @@
                             </form>
                         @endif
 
-                        <form action="{{ route('reading-sessions.finish', $currentSession) }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="elapsed_seconds" id="finish-elapsed" value="0">
-                            <button type="submit" class="btn btn-success btn-lg px-4">
+                        <a href="{{ route('reading-sessions.confirm-finish', $currentSession) }}"
+                               id="finish-link"
+                               class="btn btn-success btn-lg px-4">
                                 <i class="bi bi-check-lg me-2"></i>Finish Reading
-                            </button>
-                        </form>
+                            </a>
                     </div>
                 </div>
             @else
@@ -85,8 +83,8 @@
                     <p class="text-muted mb-3 mx-auto" style="max-width: 400px;">
                         Start a focused reading session to track your time and build a consistent reading habit.
                     </p>
-                    <a href="{{ route('reading-materials.index') }}" class="btn btn-primary btn-lg px-5">
-                        <i class="bi bi-book me-2"></i>Choose Reading Material
+                    <a href="{{ route('reading-goals.index') }}" class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-bullseye me-2"></i>Choose Reading Goal
                     </a>
                 </div>
             @endif
@@ -122,11 +120,15 @@
                                     <td class="text-muted">{{ $session->start_time?->format('g:i A') ?? '—' }}</td>
                                     <td class="text-muted">{{ $session->end_time?->format('g:i A') ?? '—' }}</td>
                                     <td>
-                                        @if ($session->duration_minutes)
+                                        @php
+                                            $dMin = $session->duration_minutes;
+                                            $dSec = $session->total_seconds;
+                                            $displayMin = $dMin ?? ($dSec > 0 ? intdiv($dSec, 60) : null);
+                                        @endphp
+                                        @if ($displayMin !== null)
                                             @php
-                                                $d = $session->duration_minutes;
-                                                $hrs = intdiv($d, 60);
-                                                $mins = $d % 60;
+                                                $hrs = intdiv($displayMin, 60);
+                                                $mins = $displayMin % 60;
                                             @endphp
                                             @if ($hrs > 0)
                                                 {{ $hrs }}h {{ $mins }}m
@@ -156,8 +158,8 @@
                 <div class="text-center py-5 text-muted">
                     <i class="bi bi-clock-history fs-1 d-block mb-3"></i>
                     <p class="mb-0">No completed reading sessions yet.</p>
-                    <a href="{{ route('reading-materials.index') }}" class="btn btn-primary mt-3">
-                        <i class="bi bi-book me-1"></i>Browse Reading Materials
+                    <a href="{{ route('reading-goals.index') }}" class="btn btn-primary mt-3">
+                        <i class="bi bi-bullseye me-1"></i>Browse Reading Goals
                     </a>
                 </div>
             @endif
@@ -196,9 +198,12 @@
     function syncElapsed() {
         const secs = Math.floor(elapsed);
         const pauseInput = document.getElementById('pause-elapsed');
-        const finishInput = document.getElementById('finish-elapsed');
         if (pauseInput) pauseInput.value = secs;
-        if (finishInput) finishInput.value = secs;
+        const finishLink = document.getElementById('finish-link');
+        if (finishLink) {
+            const base = finishLink.href.split('?')[0];
+            finishLink.href = base + '?elapsed=' + secs;
+        }
     }
     syncElapsed();
 

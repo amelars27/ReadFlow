@@ -20,10 +20,11 @@ class DashboardController extends Controller
         $activeGoals = ReadingGoal::where('user_id', $userId)->where('status', 'active')->count();
 
         $recentSessions = ReadingSession::where('user_id', $userId)
-            ->with('readingMaterial')
-            ->latest()
-            ->take(5)
-            ->get();
+        ->with('readingGoal.readingMaterial')
+     ->latest()
+    ->take(5)
+    ->get();
+    
 
         $recentNotes = ReadingNote::where('user_id', $userId)
             ->with('readingMaterial')

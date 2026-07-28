@@ -1,12 +1,12 @@
 @php
     $menuItems = [
         ['label' => 'Dashboard', 'icon' => 'bi-speedometer2', 'route' => 'dashboard'],
+        ['label' => 'Reading Goals', 'icon' => 'bi-bullseye', 'route' => 'reading-goals.index', 'active' => 'reading-goals.*'],
         ['label' => 'Reading Materials', 'icon' => 'bi-book', 'route' => 'reading-materials.index', 'active' => 'reading-materials.*'],
-        ['label' => 'Categories', 'icon' => 'bi-tags', 'route' => 'categories.index', 'active' => 'categories.*'],
-        ['label' => 'Authors', 'icon' => 'bi-pencil', 'route' => 'authors.index', 'active' => 'authors.*'],
         ['label' => 'Reading Sessions', 'icon' => 'bi-clock-history', 'route' => 'reading-sessions.index', 'active' => 'reading-sessions.*'],
         ['label' => 'Reading Notes', 'icon' => 'bi-journal-text', 'route' => 'reading-notes.index', 'active' => 'reading-notes.*'],
-        ['label' => 'Reading Goals', 'icon' => 'bi-bullseye', 'route' => 'reading-goals.index', 'active' => 'reading-goals.*'],
+        ['label' => 'Categories', 'icon' => 'bi-tags', 'route' => 'categories.index', 'active' => 'categories.*'],
+        ['label' => 'Authors', 'icon' => 'bi-pencil', 'route' => 'authors.index', 'active' => 'authors.*'],
         ['label' => 'Bookmarks', 'icon' => 'bi-bookmark', 'route' => 'bookmarks.index', 'active' => 'bookmarks.*'],
     ];
 @endphp

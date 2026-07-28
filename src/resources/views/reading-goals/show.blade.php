@@ -18,7 +18,7 @@
             default => 'bg-secondary',
         };
 
-        $sessions = $material->readingSessions;
+        $sessions = $readingGoal->readingSessions;
         $totalSessions = $sessions->count();
         $lastSession = $sessions->sortByDesc('created_at')->first();
         $totalSeconds = $sessions->sum('total_seconds');
@@ -37,7 +37,7 @@
             'time' => $readingGoal->created_at,
         ];
 
-        foreach ($material->readingSessions as $session) {
+        foreach ($readingGoal->readingSessions as $session) {
             $timeline[] = [
                 'icon' => 'bi-play-circle',
                 'title' => 'Reading Session',
@@ -249,7 +249,7 @@
                         <a href="{{ route('reading-materials.show', $material) }}" class="btn btn-outline-primary">
                             <i class="bi bi-book me-1"></i>View Book
                         </a>
-                        <form action="{{ route('reading-sessions.start', $material) }}" method="POST">
+                        <form action="{{ route('reading-sessions.start', $readingGoal) }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-success">
                                 <i class="bi bi-play-fill me-1"></i>Start Reading

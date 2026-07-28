@@ -12,9 +12,9 @@ class ReadingGoalController extends Controller
     public function index()
     {
         $readingGoals = ReadingGoal::where('user_id', auth()->id())
-            ->with(['readingMaterial.readingSessions' => function ($query) {
+            ->with(['readingSessions' => function ($query) {
                 $query->where('status', 'Completed')
-                      ->select('id', 'reading_material_id', 'duration_minutes', 'total_seconds', 'created_at');
+                      ->select('id', 'reading_goal_id', 'duration_minutes', 'total_seconds', 'created_at');
             }])
             ->latest()
             ->paginate(10);

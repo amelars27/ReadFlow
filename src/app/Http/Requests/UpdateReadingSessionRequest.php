@@ -14,12 +14,13 @@ class UpdateReadingSessionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reading_material_id' => ['required', 'exists:reading_materials,id'],
+            'reading_goal_id' => ['required', 'exists:reading_goals,id'],
             'session_date' => ['required', 'date'],
             'start_time' => ['nullable', 'date_format:H:i'],
             'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
             'duration_minutes' => ['required', 'integer', 'min:1'],
-            'pages_read' => ['nullable', 'integer', 'min:0'],
+            'start_page' => ['nullable', 'integer', 'min:0'],
+            'end_page' => ['nullable', 'integer', 'min:0'],
             'notes' => ['nullable', 'string', 'max:5000'],
         ];
     }

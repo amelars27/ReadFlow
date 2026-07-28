@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreReadingSessionRequest;
 use App\Http\Requests\UpdateReadingSessionRequest;
-use App\Models\ReadingMaterial;
+use App\Models\ReadingGoal;
 use App\Models\ReadingSession;
 use Illuminate\Http\Request;
 
@@ -13,13 +13,13 @@ class ReadingSessionController extends Controller
     public function index()
     {
         $currentSession = ReadingSession::where('user_id', auth()->id())
-            ->with('readingMaterial')
+            ->with('readingGoal.readingMaterial')
             ->inProgress()
             ->latest()
             ->first();
 
         $recentSessions = ReadingSession::where('user_id', auth()->id())
-            ->with('readingMaterial')
+            ->with('readingGoal.readingMaterial')
             ->completed()
             ->latest()
             ->paginate(10);
@@ -30,9 +30,11 @@ class ReadingSessionController extends Controller
         ));
     }
 
-    public function start(ReadingMaterial $readingMaterial)
+    public function start(ReadingGoal $readingGoal)
     {
-        $this->authorizeAccessMaterial($readingMaterial);
+        if ($readingGoal->user_id !== auth()->id()) {
+            abort(403);
+        }
 
         $existing = ReadingSession::where('user_id', auth()->id())
             ->inProgress()
@@ -46,7 +48,7 @@ class ReadingSessionController extends Controller
 
         ReadingSession::create([
             'user_id' => auth()->id(),
-            'reading_material_id' => $readingMaterial->id,
+            'reading_goal_id' => $readingGoal->id,
             'session_date' => now()->toDateString(),
             'start_time' => now()->format('H:i:s'),
             'status' => 'Active',
@@ -131,9 +133,17 @@ class ReadingSessionController extends Controller
 
     public function create()
     {
-        $readingMaterials = ReadingMaterial::where('user_id', auth()->id())
-            ->orderBy('title')
+        $readingGoals = ReadingGoal::where('user_id', auth()->id())
+            ->with('readingMaterial')
+            ->latest()
             ->get();
+
+        $readingMaterials = $readingGoals->map(function ($goal) {
+            return (object) [
+                'id' => $goal->id,
+                'title' => $goal->readingMaterial->title,
+            ];
+        });
 
         return view('reading-sessions.create', compact('readingMaterials'));
     }
@@ -154,9 +164,17 @@ class ReadingSessionController extends Controller
     {
         $this->authorizeAccess($readingSession);
 
-        $readingMaterials = ReadingMaterial::where('user_id', auth()->id())
-            ->orderBy('title')
+        $readingGoals = ReadingGoal::where('user_id', auth()->id())
+            ->with('readingMaterial')
+            ->latest()
             ->get();
+
+        $readingMaterials = $readingGoals->map(function ($goal) {
+            return (object) [
+                'id' => $goal->id,
+                'title' => $goal->readingMaterial->title,
+            ];
+        });
 
         return view('reading-sessions.edit', compact(
             'readingSession',
@@ -189,13 +207,6 @@ class ReadingSessionController extends Controller
     private function authorizeAccess(ReadingSession $readingSession): void
     {
         if ($readingSession->user_id !== auth()->id()) {
-            abort(403);
-        }
-    }
-
-    private function authorizeAccessMaterial(ReadingMaterial $readingMaterial): void
-    {
-        if ($readingMaterial->user_id !== auth()->id()) {
             abort(403);
         }
     }

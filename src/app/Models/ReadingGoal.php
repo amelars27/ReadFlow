@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ReadingGoal extends Model
 {
@@ -36,5 +37,10 @@ class ReadingGoal extends Model
     public function readingMaterial(): BelongsTo
     {
         return $this->belongsTo(ReadingMaterial::class);
+    }
+
+    public function readingSessions(): HasMany
+    {
+        return $this->hasMany(ReadingSession::class);
     }
 }

@@ -26,7 +26,7 @@
         <div class="card-body text-center py-5">
             @if ($currentSession)
                 @php
-                    $material = $currentSession->readingMaterial;
+                    $material = $currentSession->readingGoal?->readingMaterial;
                     $elapsed = $currentSession->total_seconds;
                     if ($currentSession->status === 'Active') {
                         $elapsed += now()->diffInSeconds($currentSession->updated_at);
@@ -38,11 +38,11 @@
                      data-status="{{ $currentSession->status }}"
                      data-elapsed="{{ $elapsed }}">
 
-                    <h4 class="fw-bold mb-1">{{ $material->title }}</h4>
+                    <h4 class="fw-bold mb-1">{{ $material?->title ?? 'Unknown' }}</h4>
                     <p class="text-muted mb-4">
-                        <i class="bi bi-pencil me-1"></i>{{ optional($material->author)->name ?? '-' }}
+                        <i class="bi bi-pencil me-1"></i>{{ $material?->author?->name ?? '-' }}
                         &middot;
-                        <span class="badge bg-secondary">{{ optional($material->category)->name ?? '-' }}
+                        <span class="badge bg-secondary">{{ $material?->category?->name ?? '-' }}</span>
                     </p>
 
                     <div class="display-1 fw-bold my-4" id="timer-display">
@@ -117,7 +117,7 @@
                         <tbody>
                             @foreach ($recentSessions as $session)
                                 <tr>
-                                    <td class="fw-semibold">{{ $session->readingMaterial->title }}</td>
+                                    <td class="fw-semibold">{{ $session->readingGoal?->readingMaterial?->title ?? '—' }}</td>
                                     <td class="text-muted">{{ $session->session_date?->format('M j, Y') ?? '—' }}</td>
                                     <td class="text-muted">{{ $session->start_time?->format('g:i A') ?? '—' }}</td>
                                     <td class="text-muted">{{ $session->end_time?->format('g:i A') ?? '—' }}</td>

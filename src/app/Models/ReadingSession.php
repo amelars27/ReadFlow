@@ -9,15 +9,16 @@ class ReadingSession extends Model
 {
     protected $fillable = [
         'user_id',
-        'reading_material_id',
+        'reading_goal_id',
         'session_date',
         'start_time',
         'end_time',
         'duration_minutes',
-        'pages_read',
+        'total_seconds',
+        'start_page',
+        'end_page',
         'notes',
         'status',
-        'total_seconds',
     ];
 
     protected function casts(): array
@@ -26,6 +27,8 @@ class ReadingSession extends Model
             'session_date' => 'date',
             'start_time' => 'datetime:H:i:s',
             'end_time' => 'datetime:H:i:s',
+            'start_page' => 'integer',
+            'end_page' => 'integer',
         ];
     }
 
@@ -34,9 +37,9 @@ class ReadingSession extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function readingMaterial(): BelongsTo
+    public function readingGoal(): BelongsTo
     {
-        return $this->belongsTo(ReadingMaterial::class);
+        return $this->belongsTo(ReadingGoal::class);
     }
 
     public function scopeActive($query)

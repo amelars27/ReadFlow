@@ -38,7 +38,7 @@
                         default => 'bg-secondary',
                     };
 
-                    $sessions = $material->readingSessions;
+                    $sessions = $goal->readingSessions;
                     $totalSessions = $sessions->count();
                     $lastSession = $sessions->sortByDesc('created_at')->first();
                     $totalSeconds = $sessions->sum('total_seconds');
@@ -157,7 +157,7 @@
                                 <a href="{{ route('reading-materials.show', $material) }}" class="btn btn-outline-primary btn-sm">
                                     <i class="bi bi-book me-1"></i>View Book
                                 </a>
-                                <form action="{{ route('reading-sessions.start', $material) }}" method="POST">
+                                <form action="{{ route('reading-sessions.start', $goal) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-success btn-sm">
                                         <i class="bi bi-play-fill me-1"></i>Start Reading

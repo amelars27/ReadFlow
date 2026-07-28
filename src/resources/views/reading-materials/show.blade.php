@@ -22,6 +22,9 @@
                                      class="img-fluid rounded-3"
                                      style="max-height: 260px; object-fit: contain;">
                             </div>
+                            <p class="small text-muted mt-2 mb-0">
+                                <i class="bi bi-camera me-1"></i>Click to change cover
+                            </p>
                         @else
                             <div id="cover-placeholder"
                                  role="button"
@@ -39,72 +42,49 @@
         <div class="col-md-8 col-lg-9">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-4">
-                        <div>
-                            <h3 class="fw-bold mb-1">{{ $readingMaterial->title }}</h3>
-                            <p class="text-muted mb-0">
-                                <i class="bi bi-pencil me-1"></i>{{ $readingMaterial->author->name }}
-                            </p>
-                        </div>
-                    </div>
+                    <h3 class="fw-bold mb-3">{{ $readingMaterial->title }}</h3>
 
-                    <div class="d-flex gap-2 mb-4 flex-wrap">
-                        <span class="badge bg-secondary">{{ $readingMaterial->category->name }}</span>
-                        @if ($readingMaterial->total_pages)
-                            <span class="badge bg-info">
-                                <i class="bi bi-file-text me-1"></i>{{ $readingMaterial->total_pages }} pages
+                    <div class="mb-3">
+                        <p class="mb-2">
+                            <i class="bi bi-pencil text-muted me-2"></i>
+                            <span>{{ $readingMaterial->author->name }}</span>
+                        </p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-folder me-1"></i>{{ $readingMaterial->category->name }}
                             </span>
-                        @endif
-                        @php
-                            $statusBadge = match ($readingMaterial->status->value) {
-                                'Completed' => 'success',
-                                'Reading' => 'warning',
-                                default => 'secondary',
-                            };
-                        @endphp
-                        <span class="badge bg-{{ $statusBadge }}">{{ $readingMaterial->status->value }}</span>
-                    </div>
-
-                    @php
-                        $totalPages = $readingMaterial->total_pages;
-                        $currentPage = $readingMaterial->current_page ?? 0;
-                        $progress = ($totalPages && $totalPages > 0) ? min(100, round(($currentPage / $totalPages) * 100)) : null;
-                    @endphp
-
-                    @if ($progress !== null)
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between small text-muted mb-1">
-                                <span>Page {{ $currentPage }} of {{ $totalPages }}</span>
-                                <span>{{ $progress }}%</span>
-                            </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar" role="progressbar"
-                                     style="width: {{ $progress }}%;"
-                                     aria-valuenow="{{ $progress }}"
-                                     aria-valuemin="0"
-                                     aria-valuemax="100">
-                                </div>
-                            </div>
+                            @if ($readingMaterial->total_pages)
+                                <span class="badge bg-info">
+                                    <i class="bi bi-file-text me-1"></i>{{ $readingMaterial->total_pages }} pages
+                                </span>
+                            @endif
+                            @php
+                                $statusBadge = match ($readingMaterial->status->value) {
+                                    'Completed' => 'success',
+                                    'Reading' => 'warning',
+                                    default => 'secondary',
+                                };
+                            @endphp
+                            <span class="badge bg-{{ $statusBadge }}">
+                                <i class="bi bi-tag me-1"></i>{{ $readingMaterial->status->value }}
+                            </span>
                         </div>
-                    @endif
+                    </div>
 
                     @if ($readingMaterial->description)
-                        <p class="text-muted mb-4">{{ $readingMaterial->description }}</p>
+                        <hr class="my-3">
+                        <p class="text-muted mb-0">{{ $readingMaterial->description }}</p>
                     @endif
 
-                    <div class="d-flex gap-2 mb-2">
+                    <hr class="my-3">
+
+                    <div class="d-flex gap-2 flex-wrap">
                         <form action="{{ route('reading-sessions.start', $readingMaterial) }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-success">
                                 <i class="bi bi-play-fill me-1"></i>Start Reading
                             </button>
                         </form>
-                        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#progressModal">
-                            <i class="bi bi-bar-chart me-1"></i>Update Progress
-                        </button>
-                    </div>
-
-                    <div class="d-flex gap-2 flex-wrap">
                         <form action="{{ route('bookmarks.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="reading_material_id" value="{{ $readingMaterial->id }}">
@@ -112,11 +92,9 @@
                                 <i class="bi bi-bookmark me-1"></i>Bookmark
                             </button>
                         </form>
-
                         <a href="{{ route('reading-materials.edit', $readingMaterial) }}" class="btn btn-outline-primary">
                             <i class="bi bi-pencil me-1"></i>Edit
                         </a>
-
                         <form action="{{ route('reading-materials.destroy', $readingMaterial) }}" method="POST">
                             @csrf
                             @method('DELETE')
@@ -127,7 +105,7 @@
                         </form>
                     </div>
 
-                    <hr class="my-4">
+                    <hr class="my-3">
 
                     <a href="{{ route('reading-materials.index') }}" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left me-1"></i>Back to Library
@@ -137,40 +115,6 @@
         </div>
     </div>
 
-    {{-- Progress Modal --}}
-    <div class="modal fade" id="progressModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <form action="{{ route('reading-materials.progress', $readingMaterial) }}" method="POST">
-                    @csrf
-                    <div class="modal-header border-bottom">
-                        <h6 class="modal-title fw-semibold">
-                            <i class="bi bi-bar-chart me-1"></i>Update Reading Progress
-                        </h6>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="current-page-input" class="form-label fw-semibold">Current Page</label>
-                            <input type="number" class="form-control" id="current-page-input"
-                                   name="current_page"
-                                   min="0" max="{{ $readingMaterial->total_pages ?? 0 }}"
-                                   value="{{ $readingMaterial->current_page ?? 0 }}">
-                            @if ($readingMaterial->total_pages)
-                                <div class="form-text">Total Pages: {{ $readingMaterial->total_pages }}</div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="modal-footer border-top">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-lg me-1"></i>Save
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('scripts')

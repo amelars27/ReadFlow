@@ -30,43 +30,50 @@
                          data-href="{{ route('reading-materials.show', $material) }}"
                          role="button"
                          style="cursor: pointer;">
-                        <div class="card-body d-flex flex-column">
-                            <div class="text-center mb-3">
+                        <div class="card-body d-flex flex-column p-0">
+                            <div class="d-flex flex-column align-items-center px-3 pt-3 pb-2">
                                 @if ($material->cover_image)
-                                    <div class="rounded-3 overflow-hidden d-flex align-items-center justify-content-center mx-auto" style="width: 64px; height: 64px;">
+                                    <div class="rounded-3 overflow-hidden d-flex align-items-center justify-content-center mb-3 w-100" style="height: 180px;">
                                         <img src="{{ Storage::url($material->cover_image) }}"
                                              alt="{{ $material->title }} cover"
-                                             class="img-fluid"
-                                             style="width: 64px; height: 64px; object-fit: cover;">
+                                             class="img-fluid h-100 w-100"
+                                             style="object-fit: cover;">
                                     </div>
                                 @else
-                                    <div class="bg-light rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
-                                        <i class="bi bi-book-half fs-2 text-primary"></i>
+                                    <div class="bg-light rounded-3 d-flex flex-column align-items-center justify-content-center mb-3 w-100" style="height: 180px;">
+                                        <i class="bi bi-book-half fs-1 text-primary mb-1"></i>
+                                        <span class="small text-muted">No Cover</span>
                                     </div>
                                 @endif
-                            </div>
 
-                            <h6 class="fw-semibold text-center mb-1">{{ $material->title }}</h6>
-                            <p class="small text-muted text-center mb-2">{{ $material->author->name }}</p>
+                                <h6 class="fw-semibold text-center mb-1 text-truncate w-100" title="{{ $material->title }}">{{ $material->title }}</h6>
+                                <p class="small text-muted text-center mb-2 text-truncate w-100">{{ $material->author->name }}</p>
 
-                            <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
-                                <span class="badge bg-secondary">{{ $material->category->name }}</span>
-                                @if ($material->total_pages)
-                                    <span class="badge bg-info">
-                                        <i class="bi bi-file-text me-1"></i>{{ $material->total_pages }} pages
-                                    </span>
+                                @if ($material->description)
+                                    <p class="small text-muted text-center mb-2 px-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        {{ $material->description }}
+                                    </p>
                                 @endif
-                                @php
-                                    $statusBadge = match ($material->status->value) {
-                                        'Completed' => 'success',
-                                        'Reading' => 'warning',
-                                        default => 'secondary',
-                                    };
-                                @endphp
-                                <span class="badge bg-{{ $statusBadge }}">{{ $material->status->value }}</span>
+
+                                <div class="d-flex justify-content-center gap-1 mb-2 flex-wrap">
+                                    <span class="badge bg-secondary">{{ $material->category->name }}</span>
+                                    @if ($material->total_pages)
+                                        <span class="badge bg-info">
+                                            <i class="bi bi-file-text me-1"></i>{{ $material->total_pages }} pages
+                                        </span>
+                                    @endif
+                                    @php
+                                        $statusBadge = match ($material->status->value) {
+                                            'Completed' => 'success',
+                                            'Reading' => 'warning',
+                                            default => 'secondary',
+                                        };
+                                    @endphp
+                                    <span class="badge bg-{{ $statusBadge }}">{{ $material->status->value }}</span>
+                                </div>
                             </div>
 
-                            <div class="mt-auto">
+                            <div class="border-top px-3 py-2 mt-auto">
                                 <div class="d-flex justify-content-center gap-2 mb-2">
                                     @if (isset($bookmarks[$material->id]))
                                         <form action="{{ route('bookmarks.destroy', $bookmarks[$material->id]) }}" method="POST">
@@ -85,21 +92,17 @@
                                             </button>
                                         </form>
                                     @endif
-                                    <form action="{{ route('reading-sessions.start', $material) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-success" title="Start Reading">
-                                            <i class="bi bi-play-fill me-1"></i>Start
-                                        </button>
-                                    </form>
-                                </div>
-                                <div class="d-flex justify-content-center gap-1">
-                                    <a href="{{ route('reading-materials.edit', $material) }}" class="btn btn-outline-primary btn-sm">
+                                    <a href="{{ route('reading-materials.show', $material) }}" class="btn btn-sm btn-outline-info" title="View Details">
+                                        <i class="bi bi-eye me-1"></i>View
+                                    </a>
+                                    <a href="{{ route('reading-materials.edit', $material) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form action="{{ route('reading-materials.destroy', $material) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                title="Delete"
                                                 onclick="return confirm('Are you sure you want to delete this reading material?')">
                                             <i class="bi bi-trash"></i>
                                         </button>

@@ -7,10 +7,21 @@
 @section('content')
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <form action="{{ route('reading-materials.store') }}" method="POST">
+            <form action="{{ route('reading-materials.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="row g-4">
+                    <div class="col-12">
+                        <label class="form-label">Cover Image</label>
+                        <div class="bg-light rounded-3 d-flex flex-column align-items-center justify-content-center p-4 border">
+                            <i class="bi bi-book-half fs-1 text-primary mb-2"></i>
+                            <p class="small text-muted text-center mb-1">No cover image selected</p>
+                            <p class="small text-muted text-center mb-0">
+                                <i class="bi bi-info-circle me-1"></i>Cover image can be uploaded after creation from the book detail page.
+                            </p>
+                        </div>
+                    </div>
+
                     <div class="col-12">
                         <label for="title" class="form-label">Title</label>
                         <input type="text" id="title" name="title"
@@ -67,17 +78,11 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="source_type" class="form-label">Source Type</label>
-                        <select id="source_type" name="source_type"
-                                class="form-select @error('source_type') is-invalid @enderror" required>
-                            <option value="">Select Source Type</option>
-                            @foreach ($sourceTypes as $type)
-                                <option value="{{ $type->value }}" @selected(old('source_type') == $type->value)>
-                                    {{ $type->value }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('source_type')
+                        <label for="total_pages" class="form-label">Total Pages</label>
+                        <input type="number" id="total_pages" name="total_pages"
+                               class="form-control @error('total_pages') is-invalid @enderror"
+                               value="{{ old('total_pages') }}" min="1">
+                        @error('total_pages')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -98,12 +103,27 @@
                         @enderror
                     </div>
 
+                    <div class="col-12">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" name="description" rows="4"
+                                  class="form-control @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
+                        @error('description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div class="col-md-6">
-                        <label for="total_pages" class="form-label">Total Pages</label>
-                        <input type="number" id="total_pages" name="total_pages"
-                               class="form-control @error('total_pages') is-invalid @enderror"
-                               value="{{ old('total_pages') }}" min="1">
-                        @error('total_pages')
+                        <label for="source_type" class="form-label">Source Type</label>
+                        <select id="source_type" name="source_type"
+                                class="form-select @error('source_type') is-invalid @enderror" required>
+                            <option value="">Select Source Type</option>
+                            @foreach ($sourceTypes as $type)
+                                <option value="{{ $type->value }}" @selected(old('source_type') == $type->value)>
+                                    {{ $type->value }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('source_type')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -114,15 +134,6 @@
                                class="form-control @error('source_url') is-invalid @enderror"
                                value="{{ old('source_url') }}">
                         @error('source_url')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-12">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea id="description" name="description" rows="4"
-                                  class="form-control @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
-                        @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

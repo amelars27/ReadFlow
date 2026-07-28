@@ -44,6 +44,15 @@ class ReadingGoalController extends Controller
             ->with('success', 'Reading goal created successfully.');
     }
 
+    public function show(ReadingGoal $readingGoal)
+    {
+        $this->authorizeAccess($readingGoal);
+
+        $readingGoal->load(['readingMaterial.author', 'readingMaterial.category']);
+
+        return view('reading-goals.show', compact('readingGoal'));
+    }
+
     public function edit(ReadingGoal $readingGoal)
     {
         $this->authorizeAccess($readingGoal);

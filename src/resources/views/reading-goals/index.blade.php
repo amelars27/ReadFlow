@@ -41,41 +41,44 @@
                     $sessions = $material->readingSessions;
                     $totalSessions = $sessions->count();
                     $lastSession = $sessions->sortByDesc('created_at')->first();
-                    $lastDuration = $lastSession?->duration_minutes;
                     $totalSeconds = $sessions->sum('total_seconds');
                     $totalMin = intdiv($totalSeconds, 60);
                     $totalHrs = intdiv($totalMin, 60);
                     $totalMins = $totalMin % 60;
-
-                    $goalStatusBadge = $goal->status === 'completed' ? 'success' : 'primary';
-                    $readingStatusBadge = match ($material->status->value) {
-                        'Completed' => 'success',
-                        'Reading' => 'warning',
-                        default => 'secondary',
-                    };
                 @endphp
 
                 <div class="col-sm-6 col-lg-4 col-xl-3">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body d-flex flex-column">
+                    <div class="card border-0 shadow-sm h-100"
+                         data-href="{{ route('reading-goals.show', $goal) }}"
+                         role="button"
+                         style="cursor: pointer;">
+                        <div class="card-body d-flex flex-column p-3">
+
+                            {{-- 1. Book Information --}}
                             <div class="text-center mb-3">
                                 @if ($material->cover_image)
-                                    <div class="rounded-3 overflow-hidden d-flex align-items-center justify-content-center mx-auto" style="width: 72px; height: 72px;">
+                                    <div class="rounded-3 overflow-hidden d-flex align-items-center justify-content-center mx-auto mb-2 w-100" style="height: 120px;">
                                         <img src="{{ Storage::url($material->cover_image) }}"
                                              alt="{{ $material->title }} cover"
-                                             class="img-fluid"
-                                             style="width: 72px; height: 72px; object-fit: cover;">
+                                             class="img-fluid h-100 w-100"
+                                             style="object-fit: cover;">
                                     </div>
                                 @else
-                                    <div class="bg-light rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 72px; height: 72px;">
-                                        <i class="bi bi-book-half fs-2 text-primary"></i>
+                                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center mx-auto mb-2 w-100" style="height: 120px;">
+                                        <i class="bi bi-book-half fs-1 text-primary"></i>
                                     </div>
                                 @endif
+                                <h6 class="fw-semibold text-center mb-1 text-truncate" title="{{ $material->title }}">{{ $material->title }}</h6>
+                                @if ($material->description)
+                                    <p class="small text-muted text-center mb-1 px-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        {{ $material->description }}
+                                    </p>
+                                @endif
+                                <p class="small text-muted text-center mb-1">{{ $material->author->name }}</p>
+                                <span class="badge bg-secondary">{{ $material->category->name }}</span>
                             </div>
 
-                            <h6 class="fw-semibold text-center mb-1">{{ $material->title }}</h6>
-                            <p class="small text-muted text-center mb-3">{{ $material->author->name }}</p>
-
+                            {{-- 2. Reading Progress --}}
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between small text-muted mb-1">
                                     <span>{{ $currentPage }} / {{ $totalPages ?: '—' }} pages</span>
@@ -97,11 +100,30 @@
                                 @endif
                             </div>
 
+                            {{-- 3. Goal Information --}}
+                            <div class="d-flex justify-content-between align-items-center mb-3 small">
+                                <div>
+                                    <i class="bi bi-calendar3 text-muted me-1"></i>
+                                    <span class="text-muted">Target:</span>
+                                    <span class="fw-semibold">{{ $goal->end_date->format('M d, Y') }}</span>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <span class="badge bg-{{ $goal->status === 'completed' ? 'success' : 'primary' }}">
+                                        {{ ucfirst($goal->status) }}
+                                    </span>
+                                    <span class="badge bg-secondary">{{ ucfirst($goal->goal_type) }}</span>
+                                </div>
+                            </div>
+
+                            {{-- 4. Reading Sessions --}}
                             <div class="bg-light rounded-3 p-2 mb-3 small">
+                                <div class="fw-semibold mb-2">
+                                    <i class="bi bi-clock-history me-1"></i>Reading Sessions
+                                </div>
                                 @if ($totalSessions > 0)
                                     <div class="d-flex justify-content-between mb-1">
-                                        <span class="text-muted">Last Session:</span>
-                                        <span class="fw-semibold">{{ $lastDuration }} min</span>
+                                        <span class="text-muted">Total Sessions:</span>
+                                        <span class="fw-semibold">{{ $totalSessions }}</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-1">
                                         <span class="text-muted">Total Time:</span>
@@ -113,26 +135,25 @@
                                             @endif
                                         </span>
                                     </div>
-                                    <div class="d-flex justify-content-between">
-                                        <span class="text-muted">Sessions:</span>
-                                        <span class="fw-semibold">{{ $totalSessions }}</span>
-                                    </div>
+                                    @if ($lastSession)
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">Last Session:</span>
+                                            <span class="fw-semibold">
+                                                @if ($lastSession->duration_minutes)
+                                                    {{ $lastSession->duration_minutes }} min
+                                                @else
+                                                    {{ $lastSession->created_at->diffForHumans() }}
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @endif
                                 @else
-                                    <div class="text-center text-muted">No reading sessions yet.</div>
+                                    <div class="text-center text-muted py-1">No reading sessions yet.</div>
                                 @endif
                             </div>
 
-                            <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
-                                <span class="badge bg-{{ $goalStatusBadge }}">{{ ucfirst($goal->status) }}</span>
-                                <span class="badge bg-{{ $readingStatusBadge }}">{{ $material->status->value }}</span>
-                                <span class="badge bg-secondary">{{ ucfirst($goal->goal_type) }}</span>
-                            </div>
-
-                            <div class="text-center small text-muted mb-3">
-                                <i class="bi bi-calendar3 me-1"></i>Target: {{ $goal->end_date->format('M d, Y') }}
-                            </div>
-
-                            <div class="mt-auto d-flex justify-content-center gap-2 flex-wrap">
+                            {{-- 5. Action Buttons --}}
+                            <div class="d-flex justify-content-center gap-2 flex-wrap">
                                 <a href="{{ route('reading-materials.show', $material) }}" class="btn btn-outline-primary btn-sm">
                                     <i class="bi bi-book me-1"></i>View Book
                                 </a>
@@ -163,4 +184,18 @@
             </a>
         </div>
     @endif
+
 @endsection
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.card[data-href]').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+            if (e.target.closest('a') || e.target.closest('button') || e.target.closest('form') || e.target.closest('input')) {
+                return;
+            }
+            window.location.href = card.dataset.href;
+        });
+    });
+</script>
+@endpush

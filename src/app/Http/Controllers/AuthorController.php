@@ -5,15 +5,25 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAuthorRequest;
 use App\Http\Requests\UpdateAuthorRequest;
 use App\Models\Author;
+use Illuminate\Http\Request;
 
 class AuthorController extends Controller
 {
-    public function index()
-    {
-        $authors = Author::latest()->paginate(10);
+    public function index(Request $request)
+{
+    $query = Author::withCount('readingMaterials');
 
-        return view('authors.index', compact('authors'));
+    if ($request->filled('search')) {
+        $query->where('name', 'like', '%' . $request->search . '%');
     }
+
+    $authors = $query
+        ->latest()
+        ->paginate(12)
+        ->withQueryString();
+
+    return view('authors.index', compact('authors'));
+}
 
     public function create()
     {

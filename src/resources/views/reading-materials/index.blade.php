@@ -46,16 +46,38 @@
                                     </div>
                                 @endif
 
-                                <h6 class="fw-semibold text-center mb-1 text-truncate w-100" title="{{ $material->title }}">{{ $material->title }}</h6>
-                                <p class="small text-muted text-center mb-2 text-truncate w-100">{{ $material->author->name }}</p>
+                                <h6 class="fw-semibold text-center mb-1 text-truncate w-100" title="{{ $material->title }}">
+    {{ $material->title }}
+</h6>
 
-                                @if ($material->description)
-                                    <p class="small text-muted text-center mb-2 px-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                        {{ $material->description }}
-                                    </p>
-                                @endif
+<p class="small text-muted text-center mb-2 text-truncate w-100">
+    {{ $material->author->name }}
+</p>
 
-                                <div class="d-flex justify-content-center gap-1 mb-2 flex-wrap">
+@if ($material->rating)
+    <div class="text-center mb-2">
+        @for ($i = 1; $i <= 5; $i++)
+            @if ($i <= $material->rating)
+                <i class="bi bi-star-fill text-warning"></i>
+            @else
+                <i class="bi bi-star text-warning"></i>
+            @endif
+        @endfor
+
+        <span class="small text-muted ms-1">
+            {{ $material->rating }}/5
+        </span>
+    </div>
+@endif
+
+@if ($material->description)
+    <p class="small text-muted text-center mb-2 px-1"
+       style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+        {{ $material->description }}
+    </p>
+@endif
+
+<div class="d-flex justify-content-center gap-1 mb-2 flex-wrap">
                                     <span class="badge bg-secondary">{{ $material->category->name }}</span>
                                     @if ($material->total_pages)
                                         <span class="badge bg-info">

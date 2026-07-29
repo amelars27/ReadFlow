@@ -49,6 +49,20 @@
                             <i class="bi bi-pencil text-muted me-2"></i>
                             <span>{{ $readingMaterial->author->name }}</span>
                         </p>
+                            @if($readingMaterial->rating)
+        <div class="mb-2">
+            @for($i = 1; $i <= 5; $i++)
+                @if($i <= $readingMaterial->rating)
+                    <i class="bi bi-star-fill text-warning"></i>
+                @else
+                    <i class="bi bi-star text-warning"></i>
+                @endif
+            @endfor
+            <span class="ms-2 text-muted">{{ $readingMaterial->rating }}/5</span>
+        </div>
+    @endif
+
+    <div class="d-flex gap-2 flex-wrap">
                         <div class="d-flex gap-2 flex-wrap">
                             <span class="badge bg-secondary">
                                 <i class="bi bi-folder me-1"></i>{{ $readingMaterial->category->name }}

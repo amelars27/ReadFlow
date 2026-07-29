@@ -11,22 +11,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ReadingMaterial extends Model
 {
     protected $fillable = [
-        'user_id',
-        'category_id',
-        'author_id',
-        'title',
-        'source_type',
-        'source_url',
-        'description',
-        'total_pages',
-        'total_reading_minutes',
-        'status',
-        'cover_image',
-    ];
+    'user_id',
+    'category_id',
+    'author_id',
+    'title',
+    'source_type',
+    'source_url',
+    'description',
+    'total_pages',
+    'total_reading_minutes',
+    'status',
+    'cover_image',
+    'rating',
+];
 
     protected function casts(): array
     {
         return [
+            'rating' => 'integer',
             'source_type' => SourceType::class,
             'status' => ReadingStatus::class,
         ];

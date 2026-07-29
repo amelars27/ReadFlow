@@ -5,15 +5,25 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index()
-    {
-        $categories = Category::latest()->paginate(10);
+    public function index(Request $request)
+{
+    $query = Category::withCount('readingMaterials');
 
-        return view('categories.index', compact('categories'));
+    if ($request->filled('search')) {
+        $query->where('name', 'like', '%' . $request->search . '%');
     }
+
+    $categories = $query
+        ->latest()
+        ->paginate(12)
+        ->withQueryString();
+
+    return view('categories.index', compact('categories'));
+}
 
     public function create()
     {

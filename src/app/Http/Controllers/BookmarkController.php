@@ -17,16 +17,17 @@ class BookmarkController extends Controller
         return view('bookmarks.index', compact('bookmarks'));
     }
 
-    public function store(StoreBookmarkRequest $request)
-    {
-        Bookmark::create([
+   public function store(StoreBookmarkRequest $request)
+{
+    Bookmark::firstOrCreate(
+        [
             'reading_material_id' => $request->reading_material_id,
             'user_id' => auth()->id(),
-        ]);
+        ]
+    );
 
-        return redirect()->back()->with('success', 'Bookmark added successfully.');
-    }
-
+    return redirect()->back()->with('success', 'Bookmark added successfully.');
+}
     public function destroy(Bookmark $bookmark)
     {
         if ($bookmark->user_id !== auth()->id()) {

@@ -36,20 +36,20 @@
                                 <div class="row g-0 h-100">
 
                                     @if(optional($bookmark->readingMaterial)->cover_image)
-                                        <div class="col-md-4">
-                                            <img src="{{ $bookmark->readingMaterial->cover_image }}"
-                                                 alt="{{ $bookmark->readingMaterial->title }}"
-                                                 class="img-fluid rounded-start h-100"
-                                                 style="object-fit: cover;">
-                                        </div>
-                                    @endif
+    <div class="col-md-4">
+        <img src="{{ Storage::url($bookmark->readingMaterial->cover_image) }}"
+             alt="{{ $bookmark->readingMaterial->title }}"
+             class="img-fluid rounded-start h-100"
+             style="object-fit: cover;">
+    </div>
+@endif
 
-                                    <div class="@if(optional($bookmark->readingMaterial)->cover_image) col-md-8 @else col-12 @endif">
-                                        <div class="card-body d-flex flex-column h-100">
+<div class="@if(optional($bookmark->readingMaterial)->cover_image) col-md-8 @else col-12 @endif">
+    <div class="card-body d-flex flex-column h-100">
 
-                                            <h5 class="card-title">
-                                                {{ optional($bookmark->readingMaterial)->title ?? 'Unknown Material' }}
-                                            </h5>
+        <h5 class="card-title">
+            {{ optional($bookmark->readingMaterial)->title ?? 'Unknown Material' }}
+        </h5>
 
                                             <p class="text-muted mb-1">
                                                 <i class="bi bi-pencil me-1"></i>

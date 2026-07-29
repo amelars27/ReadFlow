@@ -62,7 +62,7 @@
         </div>
     @endif
 
-    <div class="d-flex gap-2 flex-wrap">
+    <div class="d-flex gap-2 flex-wrap"> 
                         <div class="d-flex gap-2 flex-wrap">
                             <span class="badge bg-secondary">
                                 <i class="bi bi-folder me-1"></i>{{ $readingMaterial->category->name }}
@@ -96,13 +96,25 @@
                         <a href="{{ route('reading-goals.create', ['reading_material_id' => $readingMaterial->id]) }}" class="btn btn-success">
                             <i class="bi bi-bullseye me-1"></i>Set Reading Goal
                         </a>
-                        <form action="{{ route('bookmarks.store') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="reading_material_id" value="{{ $readingMaterial->id }}">
-                            <button type="submit" class="btn btn-outline-warning">
-                                <i class="bi bi-bookmark me-1"></i>Bookmark
-                            </button>
-                        </form>
+                        @if ($bookmark)
+    <form action="{{ route('bookmarks.destroy', $bookmark) }}" method="POST">
+        @csrf
+        @method('DELETE')
+
+        <button type="submit" class="btn btn-warning">
+            <i class="bi bi-bookmark-fill me-1"></i>Bookmarked
+        </button>
+    </form>
+@else
+    <form action="{{ route('bookmarks.store') }}" method="POST">
+        @csrf
+        <input type="hidden" name="reading_material_id" value="{{ $readingMaterial->id }}">
+
+        <button type="submit" class="btn btn-outline-warning">
+            <i class="bi bi-bookmark me-1"></i>Bookmark
+        </button>
+    </form>
+@endif
                         <a href="{{ route('reading-materials.edit', $readingMaterial) }}" class="btn btn-outline-primary">
                             <i class="bi bi-pencil me-1"></i>Edit
                         </a>

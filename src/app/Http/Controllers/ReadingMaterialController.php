@@ -49,14 +49,18 @@ class ReadingMaterialController extends Controller
             ->with('success', 'Reading material created successfully.');
     }
 
-    public function show(ReadingMaterial $readingMaterial)
-    {
-        $this->authorizeAccess($readingMaterial);
+  public function show(ReadingMaterial $readingMaterial)
+{
+    $this->authorizeAccess($readingMaterial);
 
-        $readingMaterial->load(['author', 'category']);
+    $readingMaterial->load(['author', 'category']);
 
-        return view('reading-materials.show', compact('readingMaterial'));
-    }
+    $bookmark = $readingMaterial->bookmarks()
+        ->where('user_id', auth()->id())
+        ->first();
+
+    return view('reading-materials.show', compact('readingMaterial', 'bookmark'));
+}
 
     public function edit(ReadingMaterial $readingMaterial)
     {

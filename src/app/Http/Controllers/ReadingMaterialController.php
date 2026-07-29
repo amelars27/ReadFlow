@@ -15,18 +15,49 @@ use Illuminate\Support\Facades\Storage;
 
 class ReadingMaterialController extends Controller
 {
-    public function index()
-    {
-        $readingMaterials = ReadingMaterial::where('user_id', auth()->id())
-            ->with(['author', 'category'])
-            ->latest()
-            ->paginate(12);
+    public function index(Request $request)
+{
+    $query = ReadingMaterial::where('user_id', auth()->id())
+        ->with(['author', 'category']);
 
-        $bookmarks = Bookmark::where('user_id', auth()->id())
-            ->pluck('id', 'reading_material_id');
+    // Search
+    if ($request->filled('search')) {
+        $search = $request->search;
 
-        return view('reading-materials.index', compact('readingMaterials', 'bookmarks'));
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhereHas('author', function ($author) use ($search) {
+                  $author->where('name', 'like', "%{$search}%");
+              });
+        });
     }
+
+    // Category Filter
+    if ($request->filled('category')) {
+        $query->where('category_id', $request->category);
+    }
+
+    // Status Filter
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    $readingMaterials = $query
+        ->latest()
+        ->paginate(12)
+        ->withQueryString();
+
+    $bookmarks = Bookmark::where('user_id', auth()->id())
+        ->pluck('id', 'reading_material_id');
+
+    $categories = Category::orderBy('name')->get();
+
+    return view('reading-materials.index', compact(
+        'readingMaterials',
+        'bookmarks',
+        'categories'
+    ));
+}
 
     public function create()
     {

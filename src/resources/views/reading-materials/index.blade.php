@@ -13,15 +13,119 @@
         </div>
     @endif
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <p class="text-muted mb-0">
-            <i class="bi bi-collection me-1"></i>{{ $readingMaterials->total() }} material{{ $readingMaterials->total() !== 1 ? 's' : '' }}
-        </p>
-        <a href="{{ route('reading-materials.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i>Add New
-        </a>
+    <div class="row align-items-end mb-4">
+
+    <div class="col-lg-8">
+
+        <form method="GET">
+
+            <div class="row g-2">
+
+                <div class="col-md-5">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder=" Search title or author..."
+                        value="{{ request('search') }}">
+
+                </div>
+                <div class="col-md-2 d-grid">
+
+                    <button
+                        class="btn btn-primary">
+
+                        Search 
+
+                    </button>               
+
+                </div>
+
+                <div class="col-md-3">
+                    
+
+                    <select
+                        name="category"
+                        class="form-select">
+
+                        <option value="">All Categories</option>
+
+                        @foreach($categories as $category)
+
+                            <option
+                                value="{{ $category->id }}"
+                                @selected(request('category') == $category->id)>
+
+                                {{ $category->name }}
+
+                            </option>
+
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <select
+                        name="status"
+                        class="form-select">
+
+                        <option value="">All Status</option>
+
+                        <option value="Want to Read"
+                            @selected(request('status') == 'Want to Read')>
+
+                            Want to Read
+
+                        </option>
+
+                        <option value="Reading"
+                            @selected(request('status') == 'Reading')>
+
+                            Reading
+
+                        </option>
+
+                        <option value="Completed"
+                            @selected(request('status') == 'Completed')>
+
+                            Completed
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </form>
+
     </div>
 
+    <div class="col-lg-4 text-end mt-3 mt-lg-0">
+
+        <a
+            href="{{ route('reading-materials.create') }}"
+            class="btn btn-primary">
+
+            <i class="bi bi-plus-lg"></i>
+
+            Add New
+
+        </a>
+
+    </div>
+
+</div>
+<a href="{{ route('reading-materials.index') }}">
+
+    Reset
+
+</a>
     @if ($readingMaterials->count())
         <div class="row g-4">
             @foreach ($readingMaterials as $material)

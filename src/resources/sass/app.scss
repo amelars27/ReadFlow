@@ -1,1 +1,13 @@
 @import 'bootstrap/scss/bootstrap';
+
+.reset-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.reset-link:hover {
+    color: #6f42c1;
+    text-decoration: underline;
+}

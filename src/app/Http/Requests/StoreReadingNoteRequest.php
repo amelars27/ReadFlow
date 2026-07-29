@@ -19,7 +19,7 @@ class StoreReadingNoteRequest extends FormRequest
             'summary' => ['required', 'string'],
             'insight' => ['required', 'string'],
             'favorite_quote' => ['nullable', 'string'],
-            'rating' => ['nullable', 'integer', 'min:1', 'max:5'],
+            
         ];
     }
 }

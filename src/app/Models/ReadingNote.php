@@ -14,7 +14,7 @@ class ReadingNote extends Model
         'summary',
         'insight',
         'favorite_quote',
-        'rating',
+        
     ];
 
     protected function casts(): array

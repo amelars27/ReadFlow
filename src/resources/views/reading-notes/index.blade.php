@@ -28,7 +28,7 @@
                             <tr>
                                 <th>Reading Material</th>
                                 <th>Note Title</th>
-                                <th>Rating</th>
+
                                 <th>Created At</th>
                                 <th class="text-end">Actions</th>
                             </tr>
@@ -38,15 +38,7 @@
                                 <tr>
                                     <td class="fw-semibold">{{ $note->readingMaterial->title }}</td>
                                     <td>{{ $note->title }}</td>
-                                    <td>
-                                        @if ($note->rating)
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <i class="bi {{ $i <= $note->rating ? 'bi-star-fill text-warning' : 'bi-star text-muted' }}"></i>
-                                            @endfor
-                                        @else
-                                            <span class="text-muted">—</span>
-                                        @endif
-                                    </td>
+                                    
                                     <td class="text-muted">{{ $note->created_at->format('M d, Y') }}</td>
                                     <td class="text-end">
                                         <a href="{{ route('reading-notes.edit', $note) }}" class="btn btn-outline-primary btn-sm me-1">

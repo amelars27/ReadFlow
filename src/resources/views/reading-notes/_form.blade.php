@@ -56,19 +56,4 @@
         @enderror
     </div>
 
-    <div class="col-md-6">
-        <label for="rating" class="form-label">Rating</label>
-        <select id="rating" name="rating"
-                class="form-select @error('rating') is-invalid @enderror">
-            <option value="">No Rating</option>
-            @for ($i = 1; $i <= 5; $i++)
-                <option value="{{ $i }}" @selected(old('rating', $isEdit ? $readingNote->rating : null) == $i)>
-                    {{ $i }} {{ $i === 1 ? 'Star' : 'Stars' }}
-                </option>
-            @endfor
-        </select>
-        @error('rating')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
-</div>
+    

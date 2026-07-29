@@ -12,12 +12,26 @@ class ReadingNoteController extends Controller
     public function index()
     {
         $readingNotes = ReadingNote::where('user_id', auth()->id())
-            ->with('readingMaterial')
-            ->latest()
-            ->paginate(10);
-
+    ->with([
+        'readingMaterial.author',
+        'readingMaterial.category',
+    ])
+    ->latest()
+    ->paginate(9);
         return view('reading-notes.index', compact('readingNotes'));
     }
+
+    public function show(ReadingNote $readingNote)
+{
+    $this->authorizeAccess($readingNote);
+
+    $readingNote->load([
+        'readingMaterial.author',
+        'readingMaterial.category',
+    ]);
+
+    return view('reading-notes.show', compact('readingNote'));
+}
 
     public function create()
     {

@@ -151,14 +151,11 @@
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-2 text-lg-end text-center">
-                                <form action="{{ route('reading-sessions.destroy', $session) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3"
-                                            onclick="return confirm('Delete this reading session?')">
-                                        <i class="bi bi-trash me-1"></i>Delete
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-outline-danger btn-sm px-3"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                        data-delete-url="{{ route('reading-sessions.destroy', $session) }}">
+                                    <i class="bi bi-trash me-1"></i>Delete
+                                </button>
                             </div>
                         </div>
                     </div>

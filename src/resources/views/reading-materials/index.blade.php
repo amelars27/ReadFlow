@@ -224,15 +224,12 @@
                                     <a href="{{ route('reading-materials.edit', $material) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form action="{{ route('reading-materials.destroy', $material) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                title="Delete"
-                                                onclick="return confirm('Are you sure you want to delete this reading material?')">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            title="Delete"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-delete-url="{{ route('reading-materials.destroy', $material) }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>

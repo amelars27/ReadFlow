@@ -87,21 +87,14 @@
 
                                     </a>
 
-                                    <form action="{{ route('reading-notes.destroy',$note) }}"
-                                        method="POST">
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-delete-url="{{ route('reading-notes.destroy', $note) }}">
 
-                                        @csrf
-                                        @method('DELETE')
+                                        <i class="bi bi-trash"></i>
 
-                                        <button
-                                            onclick="return confirm('Delete this note?')"
-                                            class="btn btn-outline-danger btn-sm">
-
-                                            <i class="bi bi-trash"></i>
-
-                                        </button>
-
-                                    </form>
+                                    </button>
 
                                 </div>
 

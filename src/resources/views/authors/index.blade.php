@@ -137,21 +137,14 @@
 
                                     </a>
 
-                                    <form action="{{ route('authors.destroy',$author) }}"
-                                          method="POST">
-
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button
+                                    <button type="button"
                                             class="btn btn-outline-danger btn-sm"
-                                            onclick="return confirm('Delete this author?')">
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-delete-url="{{ route('authors.destroy', $author) }}">
 
-                                            <i class="bi bi-trash"></i>
+                                        <i class="bi bi-trash"></i>
 
-                                        </button>
-
-                                    </form>
+                                    </button>
 
                                 </div>
 

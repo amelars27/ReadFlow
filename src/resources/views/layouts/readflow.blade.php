@@ -14,6 +14,8 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
+    <x-delete-modal />
+
     <div class="d-flex" style="min-height: 100vh;">
         <x-sidebar />
 
@@ -33,5 +35,13 @@
     </div>
 
     @stack('scripts')
+
+    <script>
+        document.querySelectorAll('[data-delete-url]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.getElementById('deleteForm').action = this.dataset.deleteUrl;
+            });
+        });
+    </script>
 </body>
 </html>

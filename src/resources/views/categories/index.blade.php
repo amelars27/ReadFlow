@@ -136,21 +136,14 @@
 
                                     </a>
 
-                                    <form action="{{ route('categories.destroy', $category) }}"
-                                          method="POST">
-
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button
+                                    <button type="button"
                                             class="btn btn-outline-danger btn-sm"
-                                            onclick="return confirm('Delete this category?')">
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-delete-url="{{ route('categories.destroy', $category) }}">
 
-                                            <i class="bi bi-trash"></i>
+                                        <i class="bi bi-trash"></i>
 
-                                        </button>
-
-                                    </form>
+                                    </button>
 
                                 </div>
 

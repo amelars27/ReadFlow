@@ -91,6 +91,11 @@
         </div>
     </div>
 
+    <style>
+        .session-bar:hover { background-color: #f8f9fa; }
+        .session-bar:last-child { border-bottom: none !important; }
+    </style>
+
     {{-- Recent Sessions --}}
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-transparent border-bottom">
@@ -100,60 +105,64 @@
         </div>
         <div class="card-body p-0">
             @if ($recentSessions->count())
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Reading Material</th>
-                                <th>Date</th>
-                                <th>Started</th>
-                                <th>Finished</th>
-                                <th>Duration</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($recentSessions as $session)
-                                <tr>
-                                    <td class="fw-semibold">{{ $session->readingGoal?->readingMaterial?->title ?? '—' }}</td>
-                                    <td class="text-muted">{{ $session->session_date?->format('M j, Y') ?? '—' }}</td>
-                                    <td class="text-muted">{{ $session->start_time?->format('g:i A') ?? '—' }}</td>
-                                    <td class="text-muted">{{ $session->end_time?->format('g:i A') ?? '—' }}</td>
-                                    <td>
-                                        @php
-                                            $dMin = $session->duration_minutes;
-                                            $dSec = $session->total_seconds;
-                                            $displayMin = $dMin ?? ($dSec > 0 ? intdiv($dSec, 60) : null);
-                                        @endphp
-                                        @if ($displayMin !== null)
-                                            @php
-                                                $hrs = intdiv($displayMin, 60);
-                                                $mins = $displayMin % 60;
-                                            @endphp
-                                            @if ($hrs > 0)
-                                                {{ $hrs }}h {{ $mins }}m
-                                            @else
-                                                {{ $mins }} min
-                                            @endif
+                @foreach ($recentSessions as $session)
+                    @php
+                        $mat = $session->readingGoal?->readingMaterial;
+                        $dMin = $session->duration_minutes;
+                        $dSec = $session->total_seconds;
+                        $displayMin = $dMin ?? ($dSec > 0 ? intdiv($dSec, 60) : null);
+                        $hrs = $displayMin !== null ? intdiv($displayMin, 60) : 0;
+                        $mins = $displayMin !== null ? $displayMin % 60 : 0;
+                    @endphp
+                    <div class="px-4 py-3 border-bottom session-bar">
+                        <div class="row align-items-center g-2">
+                            <div class="col-lg-2 col-md-3 text-center text-md-start mb-2 mb-md-0">
+                                <div class="d-inline-flex align-items-center gap-2 bg-primary bg-opacity-10 text-primary rounded-3 px-3 py-2 fw-bold" style="font-size: 1.25rem;">
+                                    <i class="bi bi-clock"></i>
+                                    @if ($displayMin !== null)
+                                        @if ($hrs > 0)
+                                            {{ $hrs }}h {{ $mins }}m
                                         @else
-                                            <span class="text-muted">—</span>
+                                            {{ $mins }}m
                                         @endif
-                                    </td>
-                                    <td class="text-end">
-                                        <form action="{{ route('reading-sessions.destroy', $session) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm"
-                                                    onclick="return confirm('Delete this reading session?')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                    @else
+                                        —
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="col-lg-5 col-md-4 mb-2 mb-md-0">
+                                <div class="fw-semibold text-dark">{{ $mat?->title ?? '—' }}</div>
+                                <small class="text-muted"><i class="bi bi-pencil me-1"></i>{{ $mat?->author?->name ?? '—' }}</small>
+                            </div>
+                            <div class="col-lg-3 col-md-3 mb-2 mb-md-0">
+                                <div class="small">
+                                    @if ($session->start_page && $session->end_page)
+                                        <span class="text-primary fw-semibold">
+                                            <i class="bi bi-file-text me-1"></i>Page {{ $session->start_page }} → {{ $session->end_page }}
+                                        </span>
+                                        <br>
+                                    @endif
+                                    <span class="text-muted">
+                                        <i class="bi bi-calendar3 me-1"></i>{{ $session->session_date?->format('M j, Y') ?? '—' }}
+                                    </span>
+                                    <span class="text-muted ms-2">
+                                        <i class="bi bi-clock"></i> {{ $session->start_time?->format('g:i A') ?? '—' }} – {{ $session->end_time?->format('g:i A') ?? '—' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 text-lg-end text-center">
+                                <form action="{{ route('reading-sessions.destroy', $session) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3"
+                                            onclick="return confirm('Delete this reading session?')">
+                                        <i class="bi bi-trash me-1"></i>Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             @else
                 <div class="text-center py-5 text-muted">
                     <i class="bi bi-clock-history fs-1 d-block mb-3"></i>

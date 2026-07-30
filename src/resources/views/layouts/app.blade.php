@@ -18,7 +18,7 @@
         @include('layouts.navigation')
 
         @isset($header)
-            <div class="bg-white border-bottom px-4 py-3">
+            <div class="border-bottom px-4 py-3" style="background-color: #EAF9FF;">
                 <div class="container">
                     <h4 class="mb-0 fw-semibold text-dark">{{ $header }}</h4>
                 </div>

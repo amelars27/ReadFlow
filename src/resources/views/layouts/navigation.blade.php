@@ -1,4 +1,4 @@
-<nav class="navbar navbar-light bg-white shadow-sm">
+<nav class="navbar navbar-light shadow-sm" style="background-color: #EAF9FF;">
     <div class="container">
         <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ route('dashboard') }}">
             <i class="bi bi-book-half text-primary"></i>

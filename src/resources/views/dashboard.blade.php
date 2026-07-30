@@ -374,7 +374,7 @@
         .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1) !important; }
         .bg-gradient-primary {
-            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+            background: linear-gradient(135deg, #1B347E 0%, #1B347E 100%);
         }
     </style>
 @endpush

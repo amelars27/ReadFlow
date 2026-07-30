@@ -21,7 +21,7 @@
             <x-topnav />
 
             @hasSection('header')
-                <div class="bg-white border-bottom px-4 py-3">
+                <div class="border-bottom px-4 py-3" style="background-color: #EAF9FF;">
                     <h4 class="mb-0 fw-semibold text-dark">@yield('header')</h4>
                 </div>
             @endif

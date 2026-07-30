@@ -1,4 +1,4 @@
-<nav class="navbar navbar-light bg-white shadow-sm px-4">
+<nav class="navbar navbar-light shadow-sm px-4" style="background-color: #EAF9FF;">
     <div class="d-flex align-items-center gap-3 w-100">
         <button class="btn btn-outline-secondary d-md-none p-1" type="button"
                 data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas"

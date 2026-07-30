@@ -11,7 +11,7 @@
     ];
 @endphp
 
-<div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarOffcanvas">
+<div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarOffcanvas" style="background-color: #EAF9FF;">
     <div class="offcanvas-header border-bottom">
         <h5 class="offcanvas-title fw-bold">ReadFlow</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
@@ -35,7 +35,7 @@
     </div>
 </div>
 
-<aside class="d-none d-md-flex flex-column bg-white border-end" style="width: 260px; position: sticky; top: 0; height: 100vh;">
+<aside class="d-none d-md-flex flex-column border-end" style="width: 260px; position: sticky; top: 0; height: 100vh; background-color: #EAF9FF;">
     <div class="p-3 border-bottom">
         <a href="{{ route('dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2">
             <i class="bi bi-book-half text-primary fs-4"></i>

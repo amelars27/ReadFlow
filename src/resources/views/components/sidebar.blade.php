@@ -35,7 +35,7 @@
     </div>
 </div>
 
-<aside class="d-none d-md-flex flex-column bg-white border-end" style="width: 260px; min-height: 100vh;">
+<aside class="d-none d-md-flex flex-column bg-white border-end" style="width: 260px; position: sticky; top: 0; height: 100vh;">
     <div class="p-3 border-bottom">
         <a href="{{ route('dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2">
             <i class="bi bi-book-half text-primary fs-4"></i>

@@ -20,7 +20,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('reading-materials', ReadingMaterialController::class);
     Route::post('reading-materials/{readingMaterial}/cover', [ReadingMaterialController::class, 'updateCover'])->name('reading-materials.cover');
-    Route::post('reading-materials/{readingMaterial}/progress', [ReadingMaterialController::class, 'updateProgress'])->name('reading-materials.progress');
     Route::resource('categories', CategoryController::class);
     Route::resource('authors', AuthorController::class);
     Route::post('reading-sessions/start/{readingGoal}', [ReadingSessionController::class, 'start'])->name('reading-sessions.start');

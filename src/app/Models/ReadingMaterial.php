@@ -19,7 +19,6 @@ class ReadingMaterial extends Model
     'source_url',
     'description',
     'total_pages',
-    'total_reading_minutes',
     'status',
     'cover_image',
     'rating',

@@ -145,33 +145,6 @@ class ReadingMaterialController extends Controller
             ->with('success', 'Cover image uploaded successfully.');
     }
 
-    public function updateProgress(Request $request, ReadingMaterial $readingMaterial)
-    {
-        $this->authorizeAccess($readingMaterial);
-
-        $request->validate([
-            'current_page' => [
-                'required',
-                'integer',
-                'min:0',
-                'max:' . ($readingMaterial->total_pages ?? 0),
-            ],
-        ]);
-
-        $readingMaterial->current_page = $request->integer('current_page');
-
-        if ($readingMaterial->total_pages && $readingMaterial->total_pages > 0) {
-            $readingMaterial->status = $readingMaterial->current_page >= $readingMaterial->total_pages
-                ? ReadingStatus::Completed
-                : ReadingStatus::Reading;
-        }
-
-        $readingMaterial->save();
-
-        return redirect()->route('reading-materials.show', $readingMaterial)
-            ->with('success', 'Reading progress updated successfully.');
-    }
-
     private function authorizeAccess(ReadingMaterial $readingMaterial): void
     {
         if ($readingMaterial->user_id !== auth()->id()) {

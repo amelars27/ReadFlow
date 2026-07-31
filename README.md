@@ -1,6 +1,6 @@
 # 📚 ReadFlow
 
-ReadFlow is a web-based reading tracker application built with Laravel 12 and Docker. It helps users organize books and reading materials, track reading progress, take notes, set reading goals, and manage bookmarks in one place.
+ReadFlow is a web-based reading tracker application built with Laravel 13 and Docker. It helps users organize books and reading materials, track reading progress, take notes, set reading goals, and manage bookmarks in one place.
 
 ---
 
@@ -9,18 +9,19 @@ ReadFlow is a web-based reading tracker application built with Laravel 12 and Do
 - 📖 Reading Materials Management
 - 👤 Author Management
 - 🏷️ Category Management
-- ⏱️ Reading Sessions
+- ⏱️ Reading Sessions (Focus Reading with timer)
 - 📝 Reading Notes
 - 🎯 Reading Goals
 - 🔖 Bookmarks
-- 📊 Dashboard
+- ⭐ Rating & Progress Tracking
+- 📊 Dashboard Analytics
 
 ---
 
 ## Tech Stack
 
-- Laravel 12
-- PHP 8.4
+- Laravel 13
+- PHP 8.3
 - MySQL 8
 - Docker
 - Nginx
@@ -95,13 +96,15 @@ http://localhost:8080
 
 ✅ CRUD Authors
 
-🚧 Reading Sessions
+✅ Reading Sessions
 
-🚧 Reading Notes
+✅ Reading Notes
 
-🚧 Reading Goals
+✅ Reading Goals
 
-🚧 Bookmarks
+✅ Bookmarks
+
+✅ Dashboard & Progress Tracking
 
 ---
 

@@ -55,7 +55,7 @@
 | Model | Fillable | Relasi |
 |-------|----------|--------|
 | `User` | name, email, password | HasMany readingMaterials, readingSessions, readingNotes, readingGoals, bookmarks |
-| `ReadingMaterial` | user_id, category_id, author_id, title, source_type, source_url, description, total_pages, total_reading_minutes, status, cover_image | BelongsTo user, category, author · HasMany readingSessions, readingNotes, bookmarks |
+| `ReadingMaterial` | user_id, category_id, author_id, title, source_type, source_url, description, total_pages, status, cover_image, rating | BelongsTo user, category, author · HasMany readingSessions, readingNotes, bookmarks |
 | `Category` | name, description | HasMany readingMaterials |
 | `Author` | name, biography | HasMany readingMaterials |
 | `ReadingSession` | user_id, reading_material_id, session_date, start_time, end_time, duration_minutes, pages_read, notes, status | BelongsTo user, readingMaterial · scopes: active(), paused(), inProgress(), completed() |
@@ -75,7 +75,7 @@
 | `CategoryController` | index, create, store, edit, update, destroy |
 | `AuthorController` | index, create, store, edit, update, destroy |
 | `ProfileController` | edit, update, destroy (Breeze bawaan) |
-| `DashboardController` | index (legacy — masih pakai Movie/Genre) |
+| `DashboardController` | index (statistik, recent activities, grafik) |
 
 ---
 

@@ -138,11 +138,10 @@ Profile           → placeholder (footer)
 ## KNOWN ISSUES
 
 1. **ProfileController** — referenced di routes tapi mungkin bermasalah. Pre-existing dari Breeze scaffold.
-2. **Legacy Requests**: `StoreMovieRequest`, `UpdateMovieRequest`, `StoreGenreRequest`, `UpdateGenreRequest` — tidak dipakai, aman dihapus nanti.
 
 ---
 
 ## NEXT TASKS (Belum dikerjakan)
 
 ### Segera — Phase 12:
-- [ ] Bersihkan legacy requests (StoreMovieRequest, UpdateMovieRequest, StoreGenreRequest, UpdateGenreRequest)
+- [ ] (kosong)
